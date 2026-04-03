@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoria della RelatiVica — Calcolatore</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-eyebrow">Bocciofila presenta:</div>
+    <h1>Teoria della <em>RelatiVica</em></h1>
+    <p>Un algoritmo ponderato per valutare una persona nella sua complessità — estetica, carattere e dinamiche relazionali.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar" id="progress-bar">
+    <div class="progress-step active" id="step-1"></div>
+    <div class="progress-step" id="step-2"></div>
+    <div class="progress-step" id="step-3"></div>
+    <div class="progress-step" id="step-4"></div>
+  </div>
+
+  <!-- STEP 1: Pesi -->
+  <div class="section visible" id="sec-1">
+    <div class="section-badge"><span></span> Step 1 di 4</div>
+    <h2>Importanza dei fattori</h2>
+    <p class="section-desc">Decidi quanto peso dai a fisico e viso. I due valori si compensano automaticamente fino a 100%.</p>
+
+    <div class="weights-row">
+      <div class="weight-group">
+        <div class="weight-label">
+          <strong>Fisico</strong>
+        </div>
+        <span class="weight-value" id="peso-fisico-display">50%</span>
+        <div class="slider-wrap">
+          <input type="range" id="peso-fisico" min="0" max="100" value="50" oninput="syncPesi(this)">
+        </div>
+      </div>
+      <div class="weight-group">
+        <div class="weight-label">
+          <strong>Viso</strong>
+        </div>
+        <span class="weight-value" id="peso-viso-display">50%</span>
+        <div class="slider-wrap">
+          <input type="range" id="peso-viso" min="0" max="100" value="50" oninput="syncPesi(this, true)">
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="goTo(2)">Continua →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Valutazione fisica -->
+  <div class="section" id="sec-2">
+    <div class="section-badge"><span></span> Step 2 di 4</div>
+    <h2>Valutazione Estetica</h2>
+    <p class="section-desc">Assegna un voto da 1 a 10 a fisico e viso. Se il fisico è ≤6, ti verrà chiesto il motivo.</p>
+
+    <div class="rating-row">
+      <div class="rating-group">
+        <label>
+          <strong>Fisico</strong>
+          Voto da 1 a 10
+        </label>
+        <div class="stars" id="stars-fisico"></div>
+      </div>
+      <div class="rating-group">
+        <label>
+          <strong>Viso</strong>
+          Voto da 1 a 10
+        </label>
+        <div class="stars" id="stars-viso"></div>
+      </div>
+    </div>
+
+    <div id="penalty-container" style="display:none">
+      <div class="penalty-box">
+        <p><strong>Il fisico ha un voto basso (≤6).</strong> Specifica il motivo per applicare il modificatore corretto:</p>
+        <div class="radio-group">
+          <label class="radio-option" id="opt-normale" onclick="selectPenalty('normale')">
+            <input type="radio" name="penalty" value="normale">
+            <div class="radio-dot"></div>
+            Assenza di forme, proporzioni o qualsiasi altro motivo — nessuna penalità
+          </label>
+          <label class="radio-option" id="opt-obesa" onclick="selectPenalty('obesa')">
+            <input type="radio" name="penalty" value="obesa">
+            <div class="radio-dot"></div>
+            Sovrappeso / obesità — <strong style="color:var(--danger)">penalità significativa</strong>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err-2">Seleziona un voto per entrambe le categorie.</div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(1)">← Indietro</button>
+      <button class="btn btn-primary" onclick="goTo(3)">Continua →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Modificatori principali -->
+  <div class="section" id="sec-3">
+    <div class="section-badge"><span></span> Step 3 di 4</div>
+    <h2>Modificatori Relazionali</h2>
+    <p class="section-desc">Questi fattori influenzano significativamente il voto finale. Le passioni pesano leggermente meno.</p>
+
+    <div class="modifier-grid">
+
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Quanto ti ama</div>
+            <div class="modifier-sub">Intensità del sentimento verso di te</div>
+          </div>
+          <div class="modifier-score" id="score-amore-d">—</div>
+        </div>
+        <div class="stars" id="stars-amore"></div>
+      </div>
+
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Carattere</div>
+            <div class="modifier-sub">Personalità, empatia, senso dell'umorismo</div>
+          </div>
+          <div class="modifier-score" id="score-carattere-d">—</div>
+        </div>
+        <div class="stars" id="stars-carattere"></div>
+      </div>
+
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Passioni</div>
+            <div class="modifier-sub">Interessi, hobby, profondità culturale</div>
+            <span class="modifier-weight-tag">peso ridotto</span>
+          </div>
+          <div class="modifier-score" id="score-passioni-d">—</div>
+        </div>
+        <div class="stars" id="stars-passioni"></div>
+      </div>
+
+    </div>
+
+    <div class="error-msg" id="err-3">Compila tutti i modificatori.</div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(2)">← Indietro</button>
+      <button class="btn btn-primary" onclick="goTo(4)">Continua →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Modificatori secondari -->
+  <div class="section" id="sec-4">
+    <div class="section-badge"><span></span> Step 4 di 4</div>
+    <h2>Contesto Sociale</h2>
+    <p class="section-desc">Fattori secondari che aggiungono sfumature alla valutazione complessiva.</p>
+
+    <div class="modifier-grid">
+
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Rapporto con i genitori</div>
+            <div class="modifier-sub">Come ti considerano i suoi genitori</div>
+            <span class="modifier-weight-tag">peso minore</span>
+          </div>
+        </div>
+        <div class="toggle-group" id="toggle-genitori">
+          <button class="toggle-btn" data-val="2" onclick="selectToggle('genitori', this, 2)">Ti adorano</button>
+          <button class="toggle-btn" data-val="1" onclick="selectToggle('genitori', this, 1)">Neutrali</button>
+          <button class="toggle-btn neg" data-val="-1" onclick="selectToggle('genitori', this, -1)">Non ti gradiscono</button>
+          <button class="toggle-btn neg" data-val="-2" onclick="selectToggle('genitori', this, -2)">Ti odiano</button>
+        </div>
+      </div>
+
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Le amiche ti odiano?</div>
+            <div class="modifier-sub">L'opinione del suo gruppo di amiche</div>
+            <span class="modifier-weight-tag">peso minore</span>
+          </div>
+        </div>
+        <div class="toggle-group" id="toggle-amiche">
+          <button class="toggle-btn" data-val="1" onclick="selectToggle('amiche', this, 1)">Ti amano</button>
+          <button class="toggle-btn" data-val="0" onclick="selectToggle('amiche', this, 0)">Indifferenti</button>
+          <button class="toggle-btn neg" data-val="-1" onclick="selectToggle('amiche', this, -1)">Ti odiano</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="error-msg" id="err-4">Seleziona un'opzione per entrambe le voci.</div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo(3)">← Indietro</button>
+      <button class="btn btn-primary" onclick="calcola()">Calcola il Punteggio</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="section" id="result-section">
+    <div class="section-badge"><span></span> Risultato</div>
+    <h2>Valutazione Finale</h2>
+
+    <div class="score-display">
+      <div class="score-ring" id="score-ring">
+        <div class="score-inner">
+          <div class="score-number" id="result-number">—</div>
+          <div class="score-denom">su 10</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="score-label" id="result-label">—</div>
+
+    <div class="breakdown" id="breakdown-box">
+      <h3>Dettaglio calcolo</h3>
+      <div id="breakdown-content"></div>
+    </div>
+
+    <br>
+    <button class="restart-btn" onclick="restart()">Ricomincia</button>
+  </div>
+
+</div>
+
+<script>
+  // State
+  const state = {
+    pesoFisico: 50,
+    pesoViso: 50,
+    votoFisico: 0,
+    votoViso: 0,
+    penaltyType: null, // 'normale' | 'obesa'
+    amore: 0,
+    carattere: 0,
+    passioni: 0,
+    genitori: null,
+    amiche: null,
+  };
+
+  // ─── Pesi ───────────────────────────────────────────────
+  function syncPesi(el, fromViso = false) {
+    const v = parseInt(el.value);
+    if (fromViso) {
+      state.pesoViso = v;
+      state.pesoFisico = 100 - v;
+      document.getElementById('peso-fisico').value = 100 - v;
+    } else {
+      state.pesoFisico = v;
+      state.pesoViso = 100 - v;
+      document.getElementById('peso-viso').value = 100 - v;
+    }
+    document.getElementById('peso-fisico-display').textContent = state.pesoFisico + '%';
+    document.getElementById('peso-viso-display').textContent = state.pesoViso + '%';
+  }
+
+  // ─── Stars ──────────────────────────────────────────────
+  function buildStars(containerId, key, displayId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'star-btn';
+      btn.textContent = i;
+      btn.onclick = () => {
+        state[key] = i;
+        updateStars(containerId, i);
+        if (displayId) document.getElementById(displayId).textContent = i;
+        // Gestione penalità fisico
+        if (key === 'votoFisico') {
+          const box = document.getElementById('penalty-container');
+          if (i <= 6) {
+            box.style.display = 'block';
+          } else {
+            box.style.display = 'none';
+            state.penaltyType = null;
+            document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+          }
+        }
+      };
+      container.appendChild(btn);
+    }
+  }
+
+  function updateStars(containerId, val) {
+    const btns = document.querySelectorAll(`#${containerId} .star-btn`);
+    btns.forEach((b, i) => {
+      b.classList.toggle('selected', i < val);
+    });
+  }
+
+  // ─── Penalty ─────────────────────────────────────────────
+  function selectPenalty(type) {
+    state.penaltyType = type;
+    document.getElementById('opt-normale').classList.toggle('selected', type === 'normale');
+    document.getElementById('opt-obesa').classList.toggle('selected', type === 'obesa');
+    document.querySelector(`input[value="${type}"]`).checked = true;
+  }
+
+  // ─── Toggle buttons ──────────────────────────────────────
+  function selectToggle(key, el, val) {
+    state[key] = val;
+    const group = document.getElementById('toggle-' + key);
+    group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ─── Navigation ──────────────────────────────────────────
+  function goTo(step) {
+    // Validate current step before moving forward
+    const current = getCurrentStep();
+    if (step > current) {
+      if (!validateStep(current)) return;
+    }
+
+    // Hide all
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.getElementById('result-section').classList.remove('visible');
+
+    if (step <= 4) {
+      document.getElementById('sec-' + step).classList.add('visible');
+      updateProgress(step);
+    }
+  }
+
+  function getCurrentStep() {
+    for (let i = 1; i <= 4; i++) {
+      if (document.getElementById('sec-' + i).classList.contains('visible')) return i;
+    }
+    return 1;
+  }
+
+  function validateStep(step) {
+    if (step === 2) {
+      if (state.votoFisico === 0 || state.votoViso === 0) {
+        showErr('err-2'); return false;
+      }
+      if (state.votoFisico <= 6 && !state.penaltyType) {
+        showErr('err-2', 'Specifica il motivo del voto basso al fisico.'); return false;
+      }
+    }
+    if (step === 3) {
+      if (state.amore === 0 || state.carattere === 0 || state.passioni === 0) {
+        showErr('err-3'); return false;
+      }
+    }
+    if (step === 4) {
+      if (state.genitori === null || state.amiche === null) {
+        showErr('err-4'); return false;
+      }
+    }
+    return true;
+  }
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  function updateProgress(step) {
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('step-' + i);
+      if (i < step) el.className = 'progress-step done';
+      else if (i === step) el.className = 'progress-step active';
+      else el.className = 'progress-step';
+    }
+  }
+
+  // ─── Calcolo ─────────────────────────────────────────────
+  function calcola() {
+    if (!validateStep(4)) return;
+
+    const wF = state.pesoFisico / 100;
+    const wV = state.pesoViso / 100;
+
+    // Voti grezzi
+    let vF = state.votoFisico;
+    let vV = state.votoViso;
+
+    // Penalità obesità
+    let penaltyApplied = 0;
+    if (state.penaltyType === 'obesa' && vF <= 6) {
+      penaltyApplied = -2.5;
+      vF = Math.max(1, vF + penaltyApplied);
+    }
+
+    // Media ponderata estetica (scala 0-10)
+    const baseEstetica = vF * wF + vV * wV;
+
+    // Modificatori principali (peso maggiore)
+    const modAmore = state.amore;       // 0-10
+    const modCarattere = state.carattere; // 0-10
+    const modPassioni = state.passioni;  // 0-10, peso ridotto
+
+    // Modificatori secondari
+    const modGenitori = state.genitori; // -2 to +2
+    const modAmiche = state.amiche;     // -1 to +1
+
+    // Formula:
+    // Base estetica: 40% del totale
+    // Amore: 20%
+    // Carattere: 20%
+    // Passioni: 12%
+    // Genitori: 5% (normalizzato)
+    // Amiche: 3% (normalizzato)
+
+    const pesoE = 0.40;
+    const pesoA = 0.20;
+    const pesoCar = 0.20;
+    const pesoPas = 0.12;
+    const pesoGen = 0.05;  // range -2..+2 → normalize to 0..10 → (val+2)/4*10
+    const pesoAmi = 0.03;  // range -1..+1 → normalize to 0..10 → (val+1)/2*10
+
+    const normGen = (modGenitori + 2) / 4 * 10;
+    const normAmi = (modAmiche + 1) / 2 * 10;
+
+    let score = baseEstetica * pesoE
+              + modAmore * pesoA
+              + modCarattere * pesoCar
+              + modPassioni * pesoPas
+              + normGen * pesoGen
+              + normAmi * pesoAmi;
+
+    // Clamp 0-10
+    score = Math.min(10, Math.max(0, score));
+    const scoreRounded = Math.round(score * 10) / 10;
+
+    showResult(scoreRounded, baseEstetica, penaltyApplied);
+  }
+
+  function showResult(score, baseEstetica, penaltyApplied) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+
+    const rs = document.getElementById('result-section');
+    rs.classList.add('visible');
+
+    document.getElementById('result-number').textContent = score.toFixed(1);
+
+    // Label
+    let label = '';
+    if (score >= 9.5) label = 'Perfetta — Rarità assoluta';
+    else if (score >= 8.5) label = 'Eccezionale';
+    else if (score >= 7.5) label = 'Molto sopra la media';
+    else if (score >= 6.5) label = 'Sopra la media';
+    else if (score >= 5.5) label = 'Nella media';
+    else if (score >= 4.5) label = 'Leggermente sotto la media';
+    else if (score >= 3) label = 'Sotto la media';
+    else label = 'Non è per te';
+    document.getElementById('result-label').textContent = label;
+
+    // Ring color by score
+    const pct = score / 10;
+    const deg = Math.round(pct * 360);
+    const ring = document.getElementById('score-ring');
+    if (score >= 7) {
+      ring.style.background = `conic-gradient(var(--accent) 0deg, var(--accent2) ${deg * 0.5}deg, var(--gold) ${deg}deg, var(--surface2) ${deg}deg)`;
+    } else if (score >= 5) {
+      ring.style.background = `conic-gradient(var(--accent2) 0deg, var(--accent) ${deg}deg, var(--surface2) ${deg}deg)`;
+    } else {
+      ring.style.background = `conic-gradient(var(--danger) 0deg, var(--muted) ${deg}deg, var(--surface2) ${deg}deg)`;
+    }
+
+    // Breakdown
+    const genitoriLabel = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[state.genitori] || '—';
+    const amicheLabel = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[state.amiche] || '—';
+    const penaltyNote = penaltyApplied !== 0 ? ` (penalità obesità: ${penaltyApplied})` : '';
+
+    document.getElementById('breakdown-content').innerHTML = `
+      <div class="breakdown-item">
+        <span>Fisico (${state.pesoFisico}%)</span>
+        <span>${state.votoFisico}/10${penaltyNote}</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Viso (${state.pesoViso}%)</span>
+        <span>${state.votoViso}/10</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Base estetica ponderata</span>
+        <span>${baseEstetica.toFixed(2)}/10</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Quanto ti ama</span>
+        <span>${state.amore}/10</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Carattere</span>
+        <span>${state.carattere}/10</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Passioni</span>
+        <span>${state.passioni}/10</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Genitori</span>
+        <span>${genitoriLabel}</span>
+      </div>
+      <div class="breakdown-item">
+        <span>Amiche</span>
+        <span>${amicheLabel}</span>
+      </div>
+      <div class="breakdown-item highlight">
+        <span><strong>Punteggio finale</strong></span>
+        <span><strong>${score.toFixed(1)} / 10</strong></span>
+      </div>
+    `;
+
+    updateProgress(5);
+  }
+
+  function restart() {
+    // Reset state
+    Object.assign(state, {
+      pesoFisico: 50, pesoViso: 50,
+      votoFisico: 0, votoViso: 0, penaltyType: null,
+      amore: 0, carattere: 0, passioni: 0,
+      genitori: null, amiche: null
+    });
+
+    // Reset sliders
+    document.getElementById('peso-fisico').value = 50;
+    document.getElementById('peso-viso').value = 50;
+    document.getElementById('peso-fisico-display').textContent = '50%';
+    document.getElementById('peso-viso-display').textContent = '50%';
+
+    // Reset penalty
+    document.getElementById('penalty-container').style.display = 'none';
+    document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('input[name="penalty"]').forEach(r => r.checked = false);
+
+    // Reset toggles
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+
+    // Rebuild stars
+    buildStars('stars-fisico', 'votoFisico', null);
+    buildStars('stars-viso', 'votoViso', null);
+    buildStars('stars-amore', 'amore', 'score-amore-d');
+    buildStars('stars-carattere', 'carattere', 'score-carattere-d');
+    buildStars('stars-passioni', 'passioni', 'score-passioni-d');
+
+    goTo(1);
+  }
+
+  // ─── Init ────────────────────────────────────────────────
+  buildStars('stars-fisico', 'votoFisico', null);
+  buildStars('stars-viso', 'votoViso', null);
+  buildStars('stars-amore', 'amore', 'score-amore-d');
+  buildStars('stars-carattere', 'carattere', 'score-carattere-d');
+  buildStars('stars-passioni', 'passioni', 'score-passioni-d');
+</script>
+</body>
+</html>
