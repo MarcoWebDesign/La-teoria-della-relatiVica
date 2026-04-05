@@ -34,3 +34,18 @@ Apri `index.html` in un browser web moderno. L'applicazione è completamente fun
 - `index.html`: Pagina principale con l'interfaccia utente
 - `style.css`: Foglio di stile con design dark theme e animazioni
 - `README.md`: Documentazione del progetto
+
+## Patch Notes
+
+### Versione 1.1 - "Modifiche di bilancio e nuove features"
+
+**Cambiamenti generali:**
+- Aggiunte nuove domande, presets e cambiamenti generali alla logica
+
+**Nerf:**
+- Nerf alle obese
+  - Il meta delle obese stava diventando esagerato, alcuni giocatori ne abusavano abbiamo dovuto ribilanciare
+
+**Buff:**
+- Buff all'amore
+  - Abbiamo buffato l'essere amati perchè io con le donne non faccio sesso, ci faccio l'ammmore

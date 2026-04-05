@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Teoria della RelatiVica — Calcolatore</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
 </head>
 <body>
 
@@ -21,40 +21,61 @@
   <!-- Navigation Menu -->
   <div class="nav-menu" id="navDropdown">
     <button class="dropdown-btn" onclick="toggleDropdown()">
-      <span class="dropdown-icon">☰</span>
+      <span class="hamburger"><span></span><span></span><span></span></span>
       Menu
     </button>
     <div class="dropdown-menu" id="dropdownMenu">
-      <a href="#" class="dropdown-item" onclick="navigateTo('calculator')">
-        <span class="item-icon">🧮</span>
-        Calcolatore
-      </a>
-      <a href="#" class="dropdown-item" onclick="navigateTo('patchnotes')">
-        <span class="item-icon">📝</span>
-        Patch Notes
-      </a>
-      <a href="#" class="dropdown-item" onclick="navigateTo('leaderboard')">
-        <span class="item-icon">🏆</span>
-        Leaderboard
-      </a>
-      <a href="#" class="dropdown-item" onclick="navigateTo('comparator')">
-        <span class="item-icon">⚖️</span>
-        Comparatore
-      </a>
+      <a href="#" class="dropdown-item" onclick="navigateTo('calculator')">Calcolatore</a>
+      <a href="#" class="dropdown-item" onclick="navigateTo('patchnotes')">Patch Notes</a>
+      <a href="#" class="dropdown-item" onclick="navigateTo('leaderboard')">Leaderboard</a>
+      <a href="#" class="dropdown-item" onclick="navigateTo('comparator')">Comparatore</a>
     </div>
   </div>
 
   <!-- Progress -->
   <div class="progress-bar" id="progress-bar">
-    <div class="progress-step active" id="step-1"></div>
+    <div class="progress-step active" id="step-0"></div>
+    <div class="progress-step" id="step-1"></div>
     <div class="progress-step" id="step-2"></div>
     <div class="progress-step" id="step-3"></div>
     <div class="progress-step" id="step-4"></div>
   </div>
 
+  <!-- STEP 0: Informazioni base -->
+  <div class="section visible" id="sec-0">
+    <div class="section-badge"><span></span> Step 1 di 5</div>
+    <h2>Informazioni Base</h2>
+    <p class="section-desc">Inserisci il nome della ragazza e specifica se la conosci. Questo determinerà il tipo di valutazione.</p>
+
+    <div class="name-input-group">
+      <label for="nome-ragazza">
+        <strong>Nome della ragazza</strong>
+        <span class="label-sub">Inserisci il nome per personalizzare la valutazione</span>
+      </label>
+      <input type="text" id="nome-ragazza" class="name-input" placeholder="Es. Chiara" maxlength="30">
+    </div>
+
+    <div class="knowledge-input-group">
+      <label>
+        <strong>Conosci questa ragazza?</strong>
+        <span class="label-sub">La risposta determinerà quali domande verranno poste</span>
+      </label>
+      <div class="knowledge-toggle" id="knowledge-toggle">
+        <button class="knowledge-btn" data-val="true" onclick="selectKnowledge(this, true)">Sì, la conosco</button>
+        <button class="knowledge-btn" data-val="false" onclick="selectKnowledge(this, false)">No, non la conosco</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err-0">Compila tutti i campi richiesti.</div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="goTo(1)">Continua →</button>
+    </div>
+  </div>
+
   <!-- STEP 1: Pesi -->
-  <div class="section visible" id="sec-1">
-    <div class="section-badge"><span></span> Step 1 di 4</div>
+  <div class="section" id="sec-1">
+    <div class="section-badge"><span></span> Step 2 di 5</div>
     <h2>Importanza dei fattori</h2>
     <p class="section-desc">Decidi quanto peso dai a fisico e viso. I due valori si compensano automaticamente fino a 100%.</p>
 
@@ -79,25 +100,63 @@
       </div>
     </div>
 
+    <div class="weights-row" id="carattere-aspetto-row" style="display:none;">
+      <div class="weight-group">
+        <div class="weight-label">
+          <strong>Carattere</strong>
+        </div>
+        <span class="weight-value" id="peso-carattere-display">50%</span>
+        <div class="slider-wrap">
+          <input type="range" id="peso-carattere" min="0" max="100" value="50" oninput="syncPesiCarattere(this)">
+        </div>
+      </div>
+      <div class="weight-group">
+        <div class="weight-label">
+          <strong>Aspetto fisico</strong>
+        </div>
+        <span class="weight-value" id="peso-aspetto-display">50%</span>
+        <div class="slider-wrap">
+          <input type="range" id="peso-aspetto" min="0" max="100" value="50" oninput="syncPesiCarattere(this, true)">
+        </div>
+      </div>
+    </div>
+
     <div class="weight-presets">
       <div class="presets-title">Predefiniti:</div>
       <div class="presets-grid">
-        <button class="preset-btn" onclick="setPreset(30, 70)">Fisico 30% • Viso 70%</button>
-        <button class="preset-btn" onclick="setPreset(40, 60)">Fisico 40% • Viso 60%</button>
-        <button class="preset-btn" onclick="setPreset(50, 50)">Fisico 50% • Viso 50%</button>
-        <button class="preset-btn" onclick="setPreset(60, 40)">Fisico 60% • Viso 40%</button>
-        <button class="preset-btn" onclick="setPreset(70, 30)">Fisico 70% • Viso 30%</button>
+        <div class="preset-dropdown">
+          <select id="fisico-viso-preset" onchange="setPresetFromSelect(this.value)">
+            <option value="">Fisico vs Viso</option>
+            <option value="30,70">Fisico 30% • Viso 70%</option>
+            <option value="40,60">Fisico 40% • Viso 60%</option>
+            <option value="50,50" selected>Fisico 50% • Viso 50%</option>
+            <option value="60,40">Fisico 60% • Viso 40%</option>
+            <option value="70,30">Fisico 70% • Viso 30%</option>
+          </select>
+        </div>
+        <div class="preset-dropdown">
+          <select id="carattere-aspetto-preset" onchange="setPresetCarattereFromSelect(this.value)">
+            <option value="">Carattere vs Aspetto</option>
+            <option value="30,70">Carattere 30% • Aspetto 70%</option>
+            <option value="40,60">Carattere 40% • Aspetto 60%</option>
+            <option value="50,50" selected>Carattere 50% • Aspetto 50%</option>
+            <option value="60,40">Carattere 60% • Aspetto 40%</option>
+            <option value="70,30">Carattere 70% • Aspetto 30%</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <div class="nav-row">
       <button class="btn btn-primary" onclick="goTo(2)">Continua →</button>
     </div>
+
+    <div class="error-msg" id="err-1">Compila tutti i campi richiesti.</div>
   </div>
 
   <!-- STEP 2: Valutazione fisica -->
   <div class="section" id="sec-2">
-    <div class="section-badge"><span></span> Step 2 di 4</div>
+    <div class="section-badge"><span></span> Step 3 di 5</div>
     <h2>Valutazione Estetica</h2>
     <p class="section-desc">Assegna un voto da 1 a 10 a fisico e viso. Se il fisico è ≤6, ti verrà chiesto il motivo.</p>
 
@@ -105,16 +164,55 @@
       <div class="rating-group">
         <label>
           <strong>Fisico</strong>
-          Voto da 1 a 10
+          <span class="label-sub">Voto da 1 a 10</span>
         </label>
         <div class="stars" id="stars-fisico"></div>
       </div>
       <div class="rating-group">
         <label>
           <strong>Viso</strong>
-          Voto da 1 a 10
+          <span class="label-sub">Voto da 1 a 10</span>
         </label>
         <div class="stars" id="stars-viso"></div>
+      </div>
+    </div>
+
+    <!-- Nuove valutazioni estetiche dettagliate -->
+    <div class="rating-row">
+      <div class="rating-group">
+        <label>
+          <strong>Tette</strong>
+          <span class="label-sub">Voto da 1 a 5</span>
+        </label>
+        <div class="stars" id="stars-tette"></div>
+      </div>
+      <div class="rating-group">
+        <label>
+          <strong>Culo</strong>
+          <span class="label-sub">Voto da 1 a 5</span>
+        </label>
+        <div class="stars" id="stars-culo"></div>
+      </div>
+    </div>
+
+    <!-- Bonus fisici -->
+    <div class="bonus-section">
+      <div class="bonus-title">Caratteristiche aggiuntive (bonus punti)</div>
+      <div class="bonus-grid">
+        <div class="bonus-item">
+          <button class="bonus-btn" id="btn-gambe" onclick="toggleBonus('gambe')">
+            <span class="bonus-icon">🦵</span>
+            <span class="bonus-label">Gambe/Cosce</span>
+            <span class="bonus-value">+0.3</span>
+          </button>
+        </div>
+        <div class="bonus-item">
+          <button class="bonus-btn" id="btn-pancia" onclick="toggleBonus('pancia')">
+            <span class="bonus-icon">👙</span>
+            <span class="bonus-label">Pancia piatta</span>
+            <span class="bonus-value">+0.2</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -146,7 +244,7 @@
 
   <!-- STEP 3: Modificatori principali -->
   <div class="section" id="sec-3">
-    <div class="section-badge"><span></span> Step 3 di 4</div>
+    <div class="section-badge"><span></span> Step 4 di 5</div>
     <h2>Modificatori Relazionali</h2>
     <p class="section-desc">Questi fattori influenzano significativamente il voto finale. Le passioni pesano leggermente meno.</p>
 
@@ -157,6 +255,7 @@
           <div>
             <div class="modifier-name">Quanto ti ama</div>
             <div class="modifier-sub">Intensità del sentimento verso di te</div>
+            <span class="modifier-weight-tag" id="amore-weight-tag" style="display:none;">peso ridotto</span>
           </div>
           <div class="modifier-score" id="score-amore-d">—</div>
         </div>
@@ -168,6 +267,7 @@
           <div>
             <div class="modifier-name">Carattere</div>
             <div class="modifier-sub">Personalità, empatia, senso dell'umorismo</div>
+            <span class="modifier-weight-tag" id="carattere-weight-tag" style="display:none;">peso ridotto</span>
           </div>
           <div class="modifier-score" id="score-carattere-d">—</div>
         </div>
@@ -179,11 +279,36 @@
           <div>
             <div class="modifier-name">Passioni</div>
             <div class="modifier-sub">Interessi, hobby, profondità culturale</div>
-            <span class="modifier-weight-tag">peso ridotto</span>
+            <span class="modifier-weight-tag" id="passioni-weight-tag" style="display:none;">peso ridotto</span>
           </div>
           <div class="modifier-score" id="score-passioni-d">—</div>
         </div>
         <div class="stars" id="stars-passioni"></div>
+      </div>
+
+      <!-- Nuovi modificatori relazionali -->
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Maturità</div>
+            <div class="modifier-sub">Livello di maturità emotiva e mentale</div>
+            <span class="modifier-weight-tag" id="maturita-weight-tag" style="display:none;">peso ridotto</span>
+          </div>
+          <div class="modifier-score" id="score-maturita-d">—</div>
+        </div>
+        <div class="stars" id="stars-maturita"></div>
+      </div>
+
+      <div class="modifier-item">
+        <div class="modifier-header">
+          <div>
+            <div class="modifier-name">Connessione</div>
+            <div class="modifier-sub">Quanto siete compatibili, quanto vi capite e vi trovate in sintonia</div>
+            <span class="modifier-weight-tag" id="connessione-weight-tag" style="display:none;">peso ridotto</span>
+          </div>
+          <div class="modifier-score" id="score-connessione-d">—</div>
+        </div>
+        <div class="stars" id="stars-connessione"></div>
       </div>
 
     </div>
@@ -198,7 +323,7 @@
 
   <!-- STEP 4: Modificatori secondari -->
   <div class="section" id="sec-4">
-    <div class="section-badge"><span></span> Step 4 di 4</div>
+    <div class="section-badge"><span></span> Step 5 di 5</div>
     <h2>Contesto Sociale</h2>
     <p class="section-desc">Fattori secondari che aggiungono sfumature alla valutazione complessiva.</p>
 
@@ -248,7 +373,7 @@
   <!-- RESULT -->
   <div class="section" id="result-section">
     <div class="section-badge"><span></span> Risultato</div>
-    <h2>Valutazione Finale</h2>
+    <h2 id="result-title">Valutazione Finale</h2>
 
     <div class="score-display">
       <div class="score-ring" id="score-ring">
@@ -271,9 +396,68 @@
   </div>
 
 <!-- COMPARATOR SECTIONS -->
+  <!-- STEP 0: Informazioni base Comparatore -->
+  <div class="section" id="comp-sec-0">
+    <div class="section-badge"><span></span> Step 1 di 5</div>
+    <h2>Informazioni Base</h2>
+    <p class="section-desc">Inserisci i nomi delle ragazze e specifica se le conosci. Questo determinerà il tipo di valutazione.</p>
+
+    <div class="comp-container">
+      <!-- Ragazza 1 -->
+      <div class="comp-column">
+        <div class="person-header">
+          <h3>Ragazza 1</h3>
+        </div>
+        <div class="name-input-group">
+          <label for="comp1-nome-ragazza">
+            <strong>Nome</strong>
+            <span class="label-sub">Inserisci il nome</span>
+          </label>
+          <input type="text" id="comp1-nome-ragazza" class="name-input" placeholder="Es. Chiara" maxlength="30">
+        </div>
+      </div>
+
+      <!-- Ragazza 2 -->
+      <div class="comp-column">
+        <div class="person-header">
+          <h3>Ragazza 2</h3>
+        </div>
+        <div class="name-input-group">
+          <label for="comp2-nome-ragazza">
+            <strong>Nome</strong>
+            <span class="label-sub">Inserisci il nome</span>
+          </label>
+          <input type="text" id="comp2-nome-ragazza" class="name-input" placeholder="Es. Sofia" maxlength="30">
+        </div>
+      </div>
+    </div>
+
+    <div class="knowledge-input-group">
+      <label>
+        <strong>Conosci queste ragazze?</strong>
+        <span class="label-sub">La risposta determinerà quali domande verranno poste per entrambe</span>
+      </label>
+      <div class="knowledge-toggle" id="comp-knowledge-toggle">
+        <button class="knowledge-btn" data-val="true" onclick="selectKnowledgeComp(this, true)">Sì, le conosco</button>
+        <button class="knowledge-btn" data-val="false" onclick="selectKnowledgeComp(this, false)">No, non le conosco</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="comp-err-0">Compila tutti i campi richiesti.</div>
+
+    <div class="note-box">
+      <p><strong>Nota:</strong> Per confrontare le ragazze, devi conoscerle entrambe o non conoscerne nessuna. Non è possibile (per ora) confrontare ragazze con livelli di conoscenza diversi.</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="navigateTo('calculator')">← Indietro</button>
+      <button class="btn btn-primary" onclick="goToComp(1)">Continua →</button>
+    </div>
+  </div>
+
   <!-- STEP 1: Pesi Comparatore -->
   <div class="section" id="comp-sec-1">
-    <div class="section-badge"><span></span> Step 1 di 4</div>
+    <div class="section-badge"><span></span> Step 2 di 5</div>
     <h2>Importanza dei fattori</h2>
     <p class="section-desc">Decidi quanto peso dai a fisico e viso. I due valori si compensano automaticamente fino a 100%.</p>
 
@@ -300,6 +484,26 @@
             <span class="weight-value" id="comp1-peso-viso-display">50%</span>
             <div class="slider-wrap">
               <input type="range" id="comp1-peso-viso" min="0" max="100" value="50" oninput="syncPesiComp(this, 1, true)">
+            </div>
+          </div>
+        </div>
+        <div class="weights-row" id="comp1-carattere-aspetto-row" style="display:none;">
+          <div class="weight-group">
+            <div class="weight-label">
+              <strong>Carattere</strong>
+            </div>
+            <span class="weight-value" id="comp1-peso-carattere-display">50%</span>
+            <div class="slider-wrap">
+              <input type="range" id="comp1-peso-carattere" min="0" max="100" value="50" oninput="syncPesiCarattereComp(this, 1)">
+            </div>
+          </div>
+          <div class="weight-group">
+            <div class="weight-label">
+              <strong>Aspetto fisico</strong>
+            </div>
+            <span class="weight-value" id="comp1-peso-aspetto-display">50%</span>
+            <div class="slider-wrap">
+              <input type="range" id="comp1-peso-aspetto" min="0" max="100" value="50" oninput="syncPesiCarattereComp(this, 1, true)">
             </div>
           </div>
         </div>
@@ -330,29 +534,66 @@
             </div>
           </div>
         </div>
+        <div class="weights-row" id="comp2-carattere-aspetto-row" style="display:none;">
+          <div class="weight-group">
+            <div class="weight-label">
+              <strong>Carattere</strong>
+            </div>
+            <span class="weight-value" id="comp2-peso-carattere-display">50%</span>
+            <div class="slider-wrap">
+              <input type="range" id="comp2-peso-carattere" min="0" max="100" value="50" oninput="syncPesiCarattereComp(this, 2)">
+            </div>
+          </div>
+          <div class="weight-group">
+            <div class="weight-label">
+              <strong>Aspetto fisico</strong>
+            </div>
+            <span class="weight-value" id="comp2-peso-aspetto-display">50%</span>
+            <div class="slider-wrap">
+              <input type="range" id="comp2-peso-aspetto" min="0" max="100" value="50" oninput="syncPesiCarattereComp(this, 2, true)">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="weight-presets">
       <div class="presets-title">Predefiniti:</div>
       <div class="presets-grid">
-        <button class="preset-btn" onclick="setPresetComp(30, 70)">Fisico 30% • Viso 70%</button>
-        <button class="preset-btn" onclick="setPresetComp(40, 60)">Fisico 40% • Viso 60%</button>
-        <button class="preset-btn" onclick="setPresetComp(50, 50)">Fisico 50% • Viso 50%</button>
-        <button class="preset-btn" onclick="setPresetComp(60, 40)">Fisico 60% • Viso 40%</button>
-        <button class="preset-btn" onclick="setPresetComp(70, 30)">Fisico 70% • Viso 30%</button>
+        <div class="preset-dropdown">
+          <select id="comp-fisico-viso-preset" onchange="setPresetCompFromSelect(this.value)">
+            <option value="">Fisico vs Viso</option>
+            <option value="30,70">Fisico 30% • Viso 70%</option>
+            <option value="40,60">Fisico 40% • Viso 60%</option>
+            <option value="50,50" selected>Fisico 50% • Viso 50%</option>
+            <option value="60,40">Fisico 60% • Viso 40%</option>
+            <option value="70,30">Fisico 70% • Viso 30%</option>
+          </select>
+        </div>
+        <div class="preset-dropdown">
+          <select id="comp-carattere-aspetto-preset" onchange="setPresetCarattereCompFromSelect(this.value)">
+            <option value="">Carattere vs Aspetto</option>
+            <option value="30,70">Carattere 30% • Aspetto 70%</option>
+            <option value="40,60">Carattere 40% • Aspetto 60%</option>
+            <option value="50,50" selected>Carattere 50% • Aspetto 50%</option>
+            <option value="60,40">Carattere 60% • Aspetto 40%</option>
+            <option value="70,30">Carattere 70% • Aspetto 30%</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <div class="nav-row">
-      <button class="btn btn-ghost" onclick="navigateTo('calculator')">← Indietro</button>
+      <button class="btn btn-ghost" onclick="goToComp(0)">← Indietro</button>
       <button class="btn btn-primary" onclick="goToComp(2)">Continua →</button>
     </div>
+
+    <div class="error-msg" id="comp-err-1">Compila tutti i campi richiesti.</div>
   </div>
 
   <!-- STEP 2: Valutazione fisica Comparatore -->
   <div class="section" id="comp-sec-2">
-    <div class="section-badge"><span></span> Step 2 di 4</div>
+    <div class="section-badge"><span></span> Step 3 di 5</div>
     <h2>Valutazione Estetica</h2>
     <p class="section-desc">Assegna un voto da 1 a 10 a fisico e viso. Se il fisico è ≤6, ti verrà chiesto il motivo.</p>
 
@@ -366,16 +607,55 @@
           <div class="rating-group">
             <label>
               <strong>Fisico</strong>
-              Voto da 1 a 10
+              <span class="label-sub">Voto da 1 a 10</span>
             </label>
             <div class="stars" id="comp1-stars-fisico"></div>
           </div>
           <div class="rating-group">
             <label>
               <strong>Viso</strong>
-              Voto da 1 a 10
+              <span class="label-sub">Voto da 1 a 10</span>
             </label>
             <div class="stars" id="comp1-stars-viso"></div>
+          </div>
+        </div>
+        
+        <!-- Nuove valutazioni estetiche dettagliate Ragazza 1 -->
+        <div class="rating-row">
+          <div class="rating-group">
+            <label>
+              <strong>Tette</strong>
+              <span class="label-sub">Voto da 1 a 5</span>
+            </label>
+            <div class="stars" id="comp1-stars-tette"></div>
+          </div>
+          <div class="rating-group">
+            <label>
+              <strong>Culo</strong>
+              <span class="label-sub">Voto da 1 a 5</span>
+            </label>
+            <div class="stars" id="comp1-stars-culo"></div>
+          </div>
+        </div>
+
+        <!-- Bonus fisici Ragazza 1 -->
+        <div class="bonus-section">
+          <div class="bonus-title">Caratteristiche aggiuntive (bonus punti)</div>
+          <div class="bonus-grid">
+            <div class="bonus-item">
+              <button class="bonus-btn" id="comp1-btn-gambe" onclick="toggleBonusComp('gambe', 1)">
+                <span class="bonus-icon">🦵</span>
+                <span class="bonus-label">Gambe/Cosce</span>
+                <span class="bonus-value">+0.3</span>
+              </button>
+            </div>
+            <div class="bonus-item">
+              <button class="bonus-btn" id="comp1-btn-pancia" onclick="toggleBonusComp('pancia', 1)">
+                <span class="bonus-icon">👙</span>
+                <span class="bonus-label">Pancia piatta</span>
+                <span class="bonus-value">+0.2</span>
+              </button>
+            </div>
           </div>
         </div>
         <div id="comp1-penalty-container" style="display:none">
@@ -406,16 +686,52 @@
           <div class="rating-group">
             <label>
               <strong>Fisico</strong>
-              Voto da 1 a 10
+              <span class="label-sub">Voto da 1 a 10</span>
             </label>
             <div class="stars" id="comp2-stars-fisico"></div>
           </div>
           <div class="rating-group">
             <label>
               <strong>Viso</strong>
-              Voto da 1 a 10
+              <span class="label-sub">Voto da 1 a 10</span>
             </label>
             <div class="stars" id="comp2-stars-viso"></div>
+          </div>
+        </div>
+        
+        <!-- Nuove valutazioni estetiche dettagliate Ragazza 2 -->
+        <div class="rating-row">
+          <div class="rating-group">
+            <label>
+              <strong>Tette</strong>
+              <span class="label-sub">Voto da 1 a 5</span>
+            </label>
+            <div class="stars" id="comp2-stars-tette"></div>
+          </div>
+          <div class="rating-group">
+            <label>
+              <strong>Culo</strong>
+              <span class="label-sub">Voto da 1 a 5</span>
+            </label>
+            <div class="stars" id="comp2-stars-culo"></div>
+          </div>
+        </div>
+
+        <!-- Bonus fisici Ragazza 2 -->
+        <div class="bonus-section">
+          <div class="bonus-title">Caratteristiche aggiuntive (bonus punti)</div>
+          <div class="bonus-grid">
+            <div class="bonus-item">
+              <button class="bonus-btn" id="comp2-btn-gambe" onclick="toggleBonusComp('gambe', 2)">
+                <span class="bonus-label">Gambe/Cosce</span>
+                <span class="bonus-value">+0.3</span>
+              </button>
+            </div>
+            <div class="bonus-item">
+              <button class="bonus-btn" id="comp2-btn-pancia" onclick="toggleBonusComp('pancia', 2)">
+                <span class="bonus-label">Pancia</span>
+              </button>
+            </div>
           </div>
         </div>
         <div id="comp2-penalty-container" style="display:none">
@@ -448,7 +764,7 @@
 
   <!-- STEP 3: Modificatori principali Comparatore -->
   <div class="section" id="comp-sec-3">
-    <div class="section-badge"><span></span> Step 3 di 4</div>
+    <div class="section-badge"><span></span> Step 4 di 5</div>
     <h2>Modificatori Relazionali</h2>
     <p class="section-desc">Questi fattori influenzano significativamente il voto finale. Le passioni pesano leggermente meno.</p>
 
@@ -464,6 +780,7 @@
               <div>
                 <div class="modifier-name">Quanto ti ama</div>
                 <div class="modifier-sub">Intensità del sentimento verso di te</div>
+                <span class="modifier-weight-tag" id="comp1-amore-weight-tag" style="display:none;">peso ridotto</span>
               </div>
               <div class="modifier-score" id="comp1-score-amore-d">—</div>
             </div>
@@ -474,6 +791,7 @@
               <div>
                 <div class="modifier-name">Carattere</div>
                 <div class="modifier-sub">Personalità, empatia, senso dell'umorismo</div>
+                <span class="modifier-weight-tag" id="comp1-carattere-weight-tag" style="display:none;">peso ridotto</span>
               </div>
               <div class="modifier-score" id="comp1-score-carattere-d">—</div>
             </div>
@@ -484,11 +802,34 @@
               <div>
                 <div class="modifier-name">Passioni</div>
                 <div class="modifier-sub">Interessi, hobby, profondità culturale</div>
-                <span class="modifier-weight-tag">peso ridotto</span>
+                <span class="modifier-weight-tag" id="comp1-passioni-weight-tag" style="display:none;">peso ridotto</span>
               </div>
               <div class="modifier-score" id="comp1-score-passioni-d">—</div>
             </div>
             <div class="stars" id="comp1-stars-passioni"></div>
+          </div>
+          <!-- Nuovi modificatori relazionali Ragazza 1 -->
+          <div class="modifier-item">
+            <div class="modifier-header">
+              <div>
+                <div class="modifier-name">Maturità</div>
+                <div class="modifier-sub">Livello di maturità emotiva e mentale</div>
+                <span class="modifier-weight-tag" id="comp1-maturita-weight-tag" style="display:none;">peso ridotto</span>
+              </div>
+              <div class="modifier-score" id="comp1-score-maturita-d">—</div>
+            </div>
+            <div class="stars" id="comp1-stars-maturita"></div>
+          </div>
+          <div class="modifier-item">
+            <div class="modifier-header">
+              <div>
+                <div class="modifier-name">Connessione</div>
+                <div class="modifier-sub">Quanto siete compatibili, quanto vi capite e vi trovate in sintonia</div>
+                <span class="modifier-weight-tag" id="comp1-connessione-weight-tag" style="display:none;">peso ridotto</span>
+              </div>
+              <div class="modifier-score" id="comp1-score-connessione-d">—</div>
+            </div>
+            <div class="stars" id="comp1-stars-connessione"></div>
           </div>
         </div>
       </div>
@@ -504,6 +845,7 @@
               <div>
                 <div class="modifier-name">Quanto ti ama</div>
                 <div class="modifier-sub">Intensità del sentimento verso di te</div>
+                <span class="modifier-weight-tag" id="comp2-amore-weight-tag" style="display:none;">peso ridotto</span>
               </div>
               <div class="modifier-score" id="comp2-score-amore-d">—</div>
             </div>
@@ -514,6 +856,7 @@
               <div>
                 <div class="modifier-name">Carattere</div>
                 <div class="modifier-sub">Personalità, empatia, senso dell'umorismo</div>
+                <span class="modifier-weight-tag" id="comp2-carattere-weight-tag" style="display:none;">peso ridotto</span>
               </div>
               <div class="modifier-score" id="comp2-score-carattere-d">—</div>
             </div>
@@ -524,11 +867,34 @@
               <div>
                 <div class="modifier-name">Passioni</div>
                 <div class="modifier-sub">Interessi, hobby, profondità culturale</div>
-                <span class="modifier-weight-tag">peso ridotto</span>
+                <span class="modifier-weight-tag" id="comp2-passioni-weight-tag" style="display:none;">peso ridotto</span>
               </div>
               <div class="modifier-score" id="comp2-score-passioni-d">—</div>
             </div>
             <div class="stars" id="comp2-stars-passioni"></div>
+          </div>
+          <!-- Nuovi modificatori relazionali Ragazza 2 -->
+          <div class="modifier-item">
+            <div class="modifier-header">
+              <div>
+                <div class="modifier-name">Maturità</div>
+                <div class="modifier-sub">Livello di maturità emotiva e mentale</div>
+                <span class="modifier-weight-tag" id="comp2-maturita-weight-tag" style="display:none;">peso ridotto</span>
+              </div>
+              <div class="modifier-score" id="comp2-score-maturita-d">—</div>
+            </div>
+            <div class="stars" id="comp2-stars-maturita"></div>
+          </div>
+          <div class="modifier-item">
+            <div class="modifier-header">
+              <div>
+                <div class="modifier-name">Connessione</div>
+                <div class="modifier-sub">Quanto siete compatibili, quanto vi capite e vi trovate in sintonia</div>
+                <span class="modifier-weight-tag" id="comp2-connessione-weight-tag" style="display:none;">peso ridotto</span>
+              </div>
+              <div class="modifier-score" id="comp2-score-connessione-d">—</div>
+            </div>
+            <div class="stars" id="comp2-stars-connessione"></div>
           </div>
         </div>
       </div>
@@ -544,7 +910,7 @@
 
   <!-- STEP 4: Modificatori secondari Comparatore -->
   <div class="section" id="comp-sec-4">
-    <div class="section-badge"><span></span> Step 4 di 4</div>
+    <div class="section-badge"><span></span> Step 5 di 5</div>
     <h2>Contesto Sociale</h2>
     <p class="section-desc">Fattori secondari che aggiungono sfumature alla valutazione complessiva.</p>
 
@@ -643,7 +1009,7 @@
       <!-- Ragazza 1 Result -->
       <div class="comp-result-column" id="comp1-result">
         <div class="person-header">
-          <h3>Ragazza 1</h3>
+          <h3 id="comp1-result-name">Ragazza 1</h3>
         </div>
         <div class="score-display">
           <div class="score-ring" id="comp1-score-ring">
@@ -665,7 +1031,7 @@
       <!-- Ragazza 2 Result -->
       <div class="comp-result-column" id="comp2-result">
         <div class="person-header">
-          <h3>Ragazza 2</h3>
+          <h3 id="comp2-result-name">Ragazza 2</h3>
         </div>
         <div class="score-display">
           <div class="score-ring" id="comp2-score-ring">
@@ -683,7 +1049,7 @@
     <!-- Winner Announcement -->
     <div class="winner-announcement" id="winner-announcement">
       <div class="winner-content">
-        <div class="winner-icon">🏆</div>
+        <div class="winner-icon">✦</div>
         <div class="winner-text" id="winner-text"></div>
       </div>
     </div>
@@ -707,7 +1073,7 @@
   <div class="patch-modal-overlay" onclick="closePatchNotes()"></div>
   <div class="patch-modal-content">
     <div class="patch-modal-header">
-      <h2>📝 Patch Notes</h2>
+      <h2>Patch Notes</h2>
       <button class="patch-close-btn" onclick="closePatchNotes()">×</button>
     </div>
     <div class="patch-modal-body" id="patchNotesContent">
@@ -723,23 +1089,38 @@
 <script>
   // State
   const state = {
+    nomeRagazza: '',
+    conosciRagazza: null, // true | false | null
     pesoFisico: 50,
     pesoViso: 50,
+    pesoCarattere: 50,
+    pesoAspetto: 50,
     votoFisico: 0,
     votoViso: 0,
-    penaltyType: null, // 'normale' | 'obesa'
+    penaltyType: null, // 'normale' | 'obesa' | null
     amore: 0,
     carattere: 0,
     passioni: 0,
-    genitori: null,
-    amiche: null,
+    genitori: null, // -2..+2
+    amiche: null,   // -1..+1
+    // Nuovi parametri
+    tette: 0,        // 1-5
+    culo: 0,         // 1-5
+    bonusGambe: false,  // +0.3 punti
+    bonusPancia: false, // +0.2 punti
+    maturita: 0,     // 1-10
+    connessione: 0   // 1-10
   };
 
   // Comparator State
   const compState = {
+    conosciRagazze: null, // true | false | null
     person1: {
+      nomeRagazza: '',
       pesoFisico: 50,
       pesoViso: 50,
+      pesoCarattere: 50,
+      pesoAspetto: 50,
       votoFisico: 0,
       votoViso: 0,
       penaltyType: null,
@@ -748,10 +1129,19 @@
       passioni: 0,
       genitori: null,
       amiche: null,
+      tette: 0,        // 1-5
+      culo: 0,         // 1-5
+      bonusGambe: false,  // +0.3 punti
+      bonusPancia: false, // +0.2 punti
+      maturita: 0,     // 1-10
+      connessione: 0   // 1-10
     },
     person2: {
+      nomeRagazza: '',
       pesoFisico: 50,
       pesoViso: 50,
+      pesoCarattere: 50,
+      pesoAspetto: 50,
       votoFisico: 0,
       votoViso: 0,
       penaltyType: null,
@@ -760,8 +1150,107 @@
       passioni: 0,
       genitori: null,
       amiche: null,
+      tette: 0,        // 1-5
+      culo: 0,         // 1-5
+      bonusGambe: false,  // +0.3 punti
+      bonusPancia: false, // +0.2 punti
+      maturita: 0,     // 1-10
+      connessione: 0   // 1-10
     }
   };
+
+  // ─── Knowledge Selection (Comparator) ─────────────────────
+  function selectKnowledgeComp(el, value) {
+    compState.conosciRagazze = value;
+    
+    // Update UI
+    document.querySelectorAll('#comp-knowledge-toggle .knowledge-btn').forEach(btn => btn.classList.remove('selected'));
+    el.classList.add('selected');
+    
+    // Show/hide personal questions based on knowledge
+    updatePersonalQuestionsVisibilityComp(1);
+    updatePersonalQuestionsVisibilityComp(2);
+  }
+
+  function updatePersonalQuestionsVisibilityComp(person) {
+    const shouldShowPersonal = compState.conosciRagazze === true;
+    
+    // Mostra/nasconde i slider carattere/aspetto per la persona specificata
+    const carattereAspettoRow = document.getElementById(`comp${person}-carattere-aspetto-row`);
+    if (carattereAspettoRow) {
+      carattereAspettoRow.style.display = shouldShowPersonal ? 'grid' : 'none';
+    }
+    
+    // Step 3: Modificatori principali (amore, carattere, passioni)
+    const step3PersonalItems = ['amore', 'carattere', 'passioni'];
+    step3PersonalItems.forEach(item => {
+      const element = document.querySelector(`#comp-sec-3 .comp-column:nth-child(${person}) .modifier-item:has(#comp${person}-stars-${item})`);
+      if (element) {
+        element.style.display = shouldShowPersonal ? 'block' : 'none';
+      }
+    });
+    
+    // Step 4: Modificatori secondari (genitori, amiche)
+    const step4PersonalItems = ['genitori', 'amiche'];
+    step4PersonalItems.forEach(item => {
+      const element = document.querySelector(`#comp-sec-4 .comp-column:nth-child(${person}) .modifier-item:has(#comp${person}-toggle-${item})`);
+      if (element) {
+        element.style.display = shouldShowPersonal ? 'block' : 'none';
+      }
+    });
+  }
+
+  // ─── Knowledge Selection ─────────────────────────────────────
+  function selectKnowledge(el, value) {
+    state.conosciRagazza = value;
+    
+    // Update UI
+    document.querySelectorAll('.knowledge-btn').forEach(btn => btn.classList.remove('selected'));
+    el.classList.add('selected');
+    
+    // Show/hide personal questions based on knowledge
+    updatePersonalQuestionsVisibility();
+  }
+
+  function updatePersonalQuestionsVisibility() {
+    const shouldShowPersonal = state.conosciRagazza === true;
+    
+    // Mostra/nasconde i slider carattere/aspetto
+    const carattereAspettoRow = document.getElementById('carattere-aspetto-row');
+    if (carattereAspettoRow) {
+      carattereAspettoRow.style.display = shouldShowPersonal ? 'grid' : 'none';
+    }
+    
+    // Step 3: Modificatori principali (amore, carattere, passioni)
+    const step3PersonalItems = ['amore', 'carattere', 'passioni'];
+    step3PersonalItems.forEach(item => {
+      const element = document.querySelector(`#sec-3 .modifier-item:has(#stars-${item})`);
+      if (element) {
+        element.style.display = shouldShowPersonal ? 'block' : 'none';
+      }
+    });
+    
+    // Step 4: Modificatori secondari (genitori, amiche)
+    const step4PersonalItems = ['genitori', 'amiche'];
+    step4PersonalItems.forEach(item => {
+      const element = document.querySelector(`#sec-4 .modifier-item:has(#toggle-${item})`);
+      if (element) {
+        element.style.display = shouldShowPersonal ? 'block' : 'none';
+      }
+    });
+    
+    // Update descriptions
+    const step3Desc = document.querySelector('#sec-3 .section-desc');
+    const step4Desc = document.querySelector('#sec-4 .section-desc');
+    
+    if (shouldShowPersonal) {
+      if (step3Desc) step3Desc.textContent = 'Questi fattori influenzano significativamente il voto finale. Le passioni pesano leggermente meno.';
+      if (step4Desc) step4Desc.textContent = 'Fattori secondari che aggiungono sfumature alla valutazione complessiva.';
+    } else {
+      if (step3Desc) step3Desc.textContent = 'Dato che non conosci la ragazza, queste domande personali vengono saltate. La valutazione si baserà solo su aspetti fisici.';
+      if (step4Desc) step4Desc.textContent = 'Dato che non conosci la ragazza, queste domande sul contesto sociale vengono saltate.';
+    }
+  }
 
   // ─── Pesi ───────────────────────────────────────────────
   function setPreset(fisico, viso) {
@@ -771,6 +1260,31 @@
     document.getElementById('peso-viso').value = viso;
     document.getElementById('peso-fisico-display').textContent = fisico + '%';
     document.getElementById('peso-viso-display').textContent = viso + '%';
+  }
+
+  function setPresetFromSelect(value) {
+    if (!value) return;
+    const [fisico, viso] = value.split(',').map(v => parseInt(v));
+    setPreset(fisico, viso);
+  }
+
+  function setPesiCarattereAspetto(v) {
+    state.pesoCarattere = v;
+    state.pesoAspetto = 100 - v;
+    document.getElementById('peso-carattere').value = v;
+    document.getElementById('peso-aspetto').value = 100 - v;
+    document.getElementById('peso-carattere-display').textContent = v + '%';
+    document.getElementById('peso-aspetto-display').textContent = (100 - v) + '%';
+    
+    // Aggiorna dinamicamente i tag "peso ridotto"
+    updateWeightTags();
+  }
+
+  function setPresetCarattereFromSelect(value) {
+    if (!value) return;
+    const [carattere, aspetto] = value.split(',').map(v => parseInt(v));
+    setPesiCarattereAspetto(carattere);
+    setPresetCarattere(carattere, aspetto);
   }
 
   function syncPesi(el, fromViso = false) {
@@ -788,11 +1302,26 @@
     document.getElementById('peso-viso-display').textContent = state.pesoViso + '%';
   }
 
+  function syncPesiCarattere(el, fromAspetto = false) {
+    const v = parseInt(el.value);
+    if (fromAspetto) {
+      state.pesoAspetto = v;
+      state.pesoCarattere = 100 - v;
+      document.getElementById('peso-carattere').value = 100 - v;
+    } else {
+      state.pesoCarattere = v;
+      state.pesoAspetto = 100 - v;
+      document.getElementById('peso-aspetto').value = 100 - v;
+    }
+    document.getElementById('peso-carattere-display').textContent = state.pesoCarattere + '%';
+    document.getElementById('peso-aspetto-display').textContent = state.pesoAspetto + '%';
+  }
+
   // ─── Stars ──────────────────────────────────────────────
-  function buildStars(containerId, key, displayId) {
+  function buildStars(containerId, key, displayId, maxStars = 10) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= maxStars; i++) {
       const btn = document.createElement('button');
       btn.className = 'star-btn';
       btn.textContent = i;
@@ -839,6 +1368,48 @@
     el.classList.add('selected');
   }
 
+  // ─── Bonus buttons ────────────────────────────────────────
+  function toggleBonus(type) {
+    if (type === 'gambe') {
+      state.bonusGambe = !state.bonusGambe;
+      document.getElementById('btn-gambe').classList.toggle('selected', state.bonusGambe);
+    } else if (type === 'pancia') {
+      state.bonusPancia = !state.bonusPancia;
+      document.getElementById('btn-pancia').classList.toggle('selected', state.bonusPancia);
+    }
+  }
+
+  // ─── Dynamic Weight Tags ───────────────────────────────────────
+  function updateWeightTags() {
+    const wCarattere = state.pesoCarattere;
+    const wAspetto = state.pesoAspetto;
+    
+    // Determina quali modificatori hanno peso ridotto
+    const relazionaliRidotti = wAspetto > wCarattere;  // Se preferisce aspetto, i relazionali sono ridotti
+    const esteticiRidotti = wCarattere > wAspetto;     // Se preferisce carattere, gli estetici sono ridotti
+    
+    // Aggiorna i tag per il calcolatore principale
+    updateModifierWeightTags('', relazionaliRidotti, esteticiRidotti);
+    
+    // Aggiorna i tag per il comparatore
+    updateModifierWeightTags('comp1', relazionaliRidotti, esteticiRidotti);
+    updateModifierWeightTags('comp2', relazionaliRidotti, esteticiRidotti);
+  }
+  
+  function updateModifierWeightTags(prefix, relazionaliRidotti, esteticiRidotti) {
+    // Modificatori relazionali
+    const relazionaliIds = ['amore', 'carattere', 'passioni', 'maturita', 'connessione'];
+    relazionaliIds.forEach(id => {
+      const tag = document.getElementById(prefix + id + '-weight-tag');
+      if (tag) {
+        tag.style.display = relazionaliRidotti ? 'inline-block' : 'none';
+      }
+    });
+    
+    // Per i modificatori estetici dettagliati (tette, culo), potremmo aggiungere tag in futuro
+    // Per ora gestiamo solo i bonus che sono sempre attivi
+  }
+
   // ─── Navigation ──────────────────────────────────────────
   function goTo(step) {
     // Validate current step before moving forward
@@ -852,19 +1423,42 @@
     document.getElementById('result-section').classList.remove('visible');
 
     if (step <= 4) {
+      // Se si va allo step 3 ma non si conosce la ragazza, salta direttamente al risultato
+      if (step === 3 && state.conosciRagazza === false) {
+        calcola();
+        return;
+      }
+      
+      // Se si va allo step 4 ma non si conosce la ragazza, salta direttamente al risultato
+      if (step === 4 && state.conosciRagazza === false) {
+        calcola();
+        return;
+      }
+      
       document.getElementById('sec-' + step).classList.add('visible');
       updateProgress(step);
     }
   }
 
   function getCurrentStep() {
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 0; i <= 4; i++) {
       if (document.getElementById('sec-' + i).classList.contains('visible')) return i;
     }
-    return 1;
+    return 0;
   }
 
   function validateStep(step) {
+    if (step === 0) {
+      if (!state.nomeRagazza.trim()) {
+        showErr('err-0', 'Inserisci il nome della ragazza.'); return false;
+      }
+      if (state.conosciRagazza === null) {
+        showErr('err-0', 'Specifica se conosci la ragazza.'); return false;
+      }
+    }
+    if (step === 1) {
+      // Step 1 non richiede validazione particolare (solo i pesi)
+    }
     if (step === 2) {
       if (state.votoFisico === 0 || state.votoViso === 0) {
         showErr('err-2'); return false;
@@ -874,13 +1468,20 @@
       }
     }
     if (step === 3) {
-      if (state.amore === 0 || state.carattere === 0 || state.passioni === 0) {
-        showErr('err-3'); return false;
+      // Only validate personal questions if user knows girl
+      if (state.conosciRagazza === true) {
+        if (state.amore === 0 || state.carattere === 0 || state.passioni === 0 ||
+            state.maturita === 0 || state.connessione === 0) {
+          showErr('err-3'); return false;
+        }
       }
     }
     if (step === 4) {
-      if (state.genitori === null || state.amiche === null) {
-        showErr('err-4'); return false;
+      // Only validate social context questions if user knows girl
+      if (state.conosciRagazza === true) {
+        if (state.genitori === null || state.amiche === null) {
+          showErr('err-4'); return false;
+        }
       }
     }
     return true;
@@ -894,7 +1495,8 @@
   }
 
   function updateProgress(step) {
-    for (let i = 1; i <= 4; i++) {
+    // Resetta tutti gli step
+    for (let i = 0; i <= 4; i++) {
       const el = document.getElementById('step-' + i);
       if (i < step) el.className = 'progress-step done';
       else if (i === step) el.className = 'progress-step active';
@@ -913,49 +1515,131 @@
     let vF = state.votoFisico;
     let vV = state.votoViso;
 
-    // Penalità obesità
-    let penaltyApplied = 0;
-    if (state.penaltyType === 'obesa' && vF <= 6) {
-      penaltyApplied = -2.5;
-      vF = Math.max(1, vF + penaltyApplied);
-    }
-
-    // Media ponderata estetica (scala 0-10)
+    // Media ponderata estetica (scala 0-10) — nessuna modifica al voto grezzo
     const baseEstetica = vF * wF + vV * wV;
 
-    // Modificatori principali (peso maggiore)
-    const modAmore = state.amore;       // 0-10
-    const modCarattere = state.carattere; // 0-10
-    const modPassioni = state.passioni;  // 0-10, peso ridotto
+    // Nuovi parametri estetici normalizzati
+    const tetteNorm = state.tette > 0 ? (state.tette / 5) * 10 : 0;  // 1-5 → 2-10
+    const culoNorm = state.culo > 0 ? (state.culo / 5) * 10 : 0;     // 1-5 → 2-10
+    const bonusFisici = (state.bonusGambe ? 0.3 : 0) + (state.bonusPancia ? 0.2 : 0);
 
-    // Modificatori secondari
-    const modGenitori = state.genitori; // -2 to +2
-    const modAmiche = state.amiche;     // -1 to +1
+    let score = baseEstetica;
+    let penaltyApplied = 0;
 
-    // Formula:
-    // Base estetica: 35% del totale
-    // Amore: 30% (aumentato)
-    // Carattere: 20%
-    // Passioni: 10%
-    // Genitori: 5% (normalizzato)
-    // Amiche: 3% (normalizzato)
+    // Se si conosce la ragazza, includi i modificatori personali
+    if (state.conosciRagazza === true) {
+      // Modificatori principali (peso maggiore)
+      const modAmore = state.amore;       // 0-10
+      const modCarattere = state.carattere; // 0-10
+      const modPassioni = state.passioni;  // 0-10, peso ridotto
+      const modMaturita = state.maturita;  // 0-10
+      const modConnessione = state.connessione; // 0-10
 
-    const pesoE = 0.35;
-    const pesoA = 0.30;  // Aumentato da 0.20 a 0.30
-    const pesoCar = 0.20;
-    const pesoPas = 0.10;  // Ridotto per compensare l'aumento di amore
-    const pesoGen = 0.05;  // range -2..+2 → normalize to 0..10 → (val+2)/4*10
-    const pesoAmi = 0.03;  // range -1..+1 → normalize to 0..10 → (val+1)/2*10
+      // Modificatori secondari
+      const modGenitori = state.genitori; // -2 to +2
+      const modAmiche = state.amiche;     // -1 to +1
 
-    const normGen = (modGenitori + 2) / 4 * 10;
-    const normAmi = (modAmiche + 1) / 2 * 10;
+      // Nuovi pesi carattere vs aspetto fisico
+      const wCarattereRel = state.pesoCarattere / 100;
+      const wAspettoRel = state.pesoAspetto / 100;
 
-    let score = baseEstetica * pesoE
-              + modAmore * pesoA
-              + modCarattere * pesoCar
-              + modPassioni * pesoPas
-              + normGen * pesoGen
-              + normAmi * pesoAmi;
+      // Logica di ponderazione basata su preferenze
+      let pesoE, pesoA, pesoCar, pesoPas, pesoMat, pesoCon, pesoGen, pesoAmi;
+      
+      const normGen = (modGenitori + 2) / 4 * 10;
+      const normAmi = (modAmiche + 1) / 2 * 10;
+      
+      if (wCarattereRel > wAspettoRel) {
+        // Preferisce carattere: modificatori relazionali normali, estetici ridotti
+        pesoE = 0.20;      // Base estetica ridotta
+        pesoA = 0.30;
+        pesoCar = 0.25;
+        pesoPas = 0.10;
+        pesoMat = 0.08;    // Nuovo: maturità
+        pesoCon = 0.07;    // Nuovo: connessione
+        pesoGen = 0.03;
+        pesoAmi = 0.02;
+        
+        // Riduci voti estetici dettagliati del 50%
+        const tetteWeighted = tetteNorm * 0.5 * 0.05;  // 5% del totale
+        const culoWeighted = culoNorm * 0.5 * 0.05;     // 5% del totale
+        const bonusWeighted = bonusFisici * 0.5;         // Bonus ridotti
+        
+        score = baseEstetica * pesoE
+                  + modAmore * pesoA
+                  + modCarattere * pesoCar
+                  + modPassioni * pesoPas
+                  + modMaturita * pesoMat
+                  + modConnessione * pesoCon
+                  + normGen * pesoGen
+                  + normAmi * pesoAmi
+                  + tetteWeighted + culoWeighted + bonusWeighted;
+                  
+      } else if (wAspettoRel > wCarattereRel) {
+        // Preferisce aspetto fisico: modificatori relazionali ridotti, estetici normali
+        pesoE = 0.30;      // Base estetica aumentata
+        pesoA = 0.15;      // Amore ridotto
+        pesoCar = 0.15;    // Carattere ridotto
+        pesoPas = 0.05;    // Passioni ridotte
+        pesoMat = 0.04;    // Maturità ridotta
+        pesoCon = 0.03;    // Connessione ridotta
+        pesoGen = 0.015;   // Genitori ridotti
+        pesoAmi = 0.01;    // Amiche ridotte
+        
+        // Pieni voti estetici dettagliati
+        const tetteWeighted = tetteNorm * 0.08;  // 8% del totale
+        const culoWeighted = culoNorm * 0.08;     // 8% del totale
+        const bonusWeighted = bonusFisici;       // Bonus pieni
+        
+        score = baseEstetica * pesoE
+                  + modAmore * pesoA
+                  + modCarattere * pesoCar
+                  + modPassioni * pesoPas
+                  + modMaturita * pesoMat
+                  + modConnessione * pesoCon
+                  + normGen * pesoGen
+                  + normAmi * pesoAmi
+                  + tetteWeighted + culoWeighted + bonusWeighted;
+                  
+      } else {
+        // 50/50: tutti i valori normali
+        pesoE = 0.25;
+        pesoA = 0.22;      // Leggermente ridotto per bilanciare
+        pesoCar = 0.20;
+        pesoPas = 0.08;
+        pesoMat = 0.06;    // Nuovo
+        pesoCon = 0.05;    // Nuovo
+        pesoGen = 0.02;
+        pesoAmi = 0.02;
+        
+        // Voti estetici dettagliati normali
+        const tetteWeighted = tetteNorm * 0.06;  // 6% del totale
+        const culoWeighted = culoNorm * 0.06;     // 6% del totale
+        const bonusWeighted = bonusFisici;       // Bonus normali
+        
+        score = baseEstetica * pesoE
+                  + modAmore * pesoA
+                  + modCarattere * pesoCar
+                  + modPassioni * pesoPas
+                  + modMaturita * pesoMat
+                  + modConnessione * pesoCon
+                  + normGen * pesoGen
+                  + normAmi * pesoAmi
+                  + tetteWeighted + culoWeighted + bonusWeighted;
+      }
+
+    } else {
+      // Se non si conosce la ragazza, il voto è basato solo sull'estetica
+      // Con un piccolo bonus per l'oggettività (fino a 0.5 punti)
+      const oggettivityBonus = Math.min(0.5, baseEstetica * 0.05);
+      
+      // Aggiungi voti estetici dettagliati anche per ragazze sconosciute
+      const tetteWeighted = tetteNorm * 0.05;
+      const culoWeighted = culoNorm * 0.05;
+      const bonusWeighted = bonusFisici;
+      
+      score = baseEstetica + oggettivityBonus + tetteWeighted + culoWeighted + bonusWeighted;
+    }
 
     // Penalità obesità che dimezza il voto finale
     if (state.penaltyType === 'obesa') {
@@ -974,6 +1658,14 @@
 
     const rs = document.getElementById('result-section');
     rs.classList.add('visible');
+
+    // Update title with name if available
+    const titleElement = document.getElementById('result-title');
+    if (state.nomeRagazza.trim()) {
+      titleElement.textContent = `Valutazione Finale: ${state.nomeRagazza}`;
+    } else {
+      titleElement.textContent = 'Valutazione Finale';
+    }
 
     document.getElementById('result-number').textContent = score.toFixed(1);
 
@@ -1001,15 +1693,11 @@
       ring.style.background = `conic-gradient(var(--danger) 0deg, var(--muted) ${deg}deg, var(--surface2) ${deg}deg)`;
     }
 
-    // Breakdown
-    const genitoriLabel = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[state.genitori] || '—';
-    const amicheLabel = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[state.amiche] || '—';
-    const penaltyNote = state.penaltyType === 'obesa' ? ' (Penalità obesità: voto finale dimezzato)' : (penaltyApplied !== 0 ? ` (penalità: ${penaltyApplied})` : '');
-
-    document.getElementById('breakdown-content').innerHTML = `
+    // Breakdown - mostra solo i dati rilevanti
+    let breakdownHTML = `
       <div class="breakdown-item">
         <span>Fisico (${state.pesoFisico}%)</span>
-        <span>${state.votoFisico}/10${penaltyNote}</span>
+        <span>${state.votoFisico}/10${state.penaltyType === 'obesa' ? ' (Penalità obesità: voto finale dimezzato)' : ''}</span>
       </div>
       <div class="breakdown-item">
         <span>Viso (${state.pesoViso}%)</span>
@@ -1019,31 +1707,89 @@
         <span>Base estetica ponderata</span>
         <span>${baseEstetica.toFixed(2)}/10</span>
       </div>
-      <div class="breakdown-item">
-        <span>Quanto ti ama</span>
-        <span>${state.amore}/10</span>
-      </div>
-      <div class="breakdown-item">
-        <span>Carattere</span>
-        <span>${state.carattere}/10</span>
-      </div>
-      <div class="breakdown-item">
-        <span>Passioni</span>
-        <span>${state.passioni}/10</span>
-      </div>
-      <div class="breakdown-item">
-        <span>Genitori</span>
-        <span>${genitoriLabel}</span>
-      </div>
-      <div class="breakdown-item">
-        <span>Amiche</span>
-        <span>${amicheLabel}</span>
-      </div>
+    `;
+
+    // Mostra sempre i nuovi parametri estetici
+    if (state.tette > 0 || state.culo > 0 || state.bonusGambe || state.bonusPancia) {
+      breakdownHTML += `
+        <div class="breakdown-item">
+          <span>Tette</span>
+          <span>${state.tette}/5</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Culo</span>
+          <span>${state.culo}/5</span>
+        </div>
+      `;
+      if (state.bonusGambe || state.bonusPancia) {
+        const bonusDesc = [];
+        if (state.bonusGambe) bonusDesc.push('Gambe +0.3');
+        if (state.bonusPancia) bonusDesc.push('Pancia +0.2');
+        breakdownHTML += `
+          <div class="breakdown-item">
+            <span>Bonus fisici</span>
+            <span>${bonusDesc.join(', ')}</span>
+          </div>
+        `;
+      }
+    }
+
+    // Aggiungi i modificatori personali solo se si conosce la ragazza
+    if (state.conosciRagazza === true) {
+      const genitoriLabel = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[state.genitori] || '—';
+      const amicheLabel = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[state.amiche] || '—';
+      
+      breakdownHTML += `
+        <div class="breakdown-item">
+          <span>Quanto ti ama</span>
+          <span>${state.amore}/10</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Carattere</span>
+          <span>${state.carattere}/10</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Passioni</span>
+          <span>${state.passioni}/10</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Maturità</span>
+          <span>${state.maturita}/10</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Connessione</span>
+          <span>${state.connessione}/10</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Genitori</span>
+          <span>${genitoriLabel}</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Amiche</span>
+          <span>${amicheLabel}</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Preferenza personale</span>
+          <span>Carattere ${state.pesoCarattere}% - Aspetto ${state.pesoAspetto}%</span>
+        </div>
+      `;
+    } else {
+      breakdownHTML += `
+        <div class="breakdown-item">
+          <span>Tipo di valutazione</span>
+          <span>Solo aspetti estetici (oggettiva)</span>
+        </div>
+      `;
+    }
+
+    breakdownHTML += `
       <div class="breakdown-item highlight">
         <span><strong>Punteggio finale</strong></span>
         <span><strong>${score.toFixed(1)} / 10</strong></span>
       </div>
     `;
+
+    document.getElementById('breakdown-content').innerHTML = breakdownHTML;
 
     updateProgress(5);
   }
@@ -1051,17 +1797,37 @@
   function restart() {
     // Reset state
     Object.assign(state, {
+      nomeRagazza: '',
+      conosciRagazza: null,
       pesoFisico: 50, pesoViso: 50,
+      pesoCarattere: 50, pesoAspetto: 50,
       votoFisico: 0, votoViso: 0, penaltyType: null,
       amore: 0, carattere: 0, passioni: 0,
-      genitori: null, amiche: null
+      genitori: null, amiche: null,
+      // Reset nuovi parametri
+      tette: 0, culo: 0,
+      bonusGambe: false, bonusPancia: false,
+      maturita: 0, connessione: 0
     });
+    document.getElementById('nome-ragazza').value = '';
+
+    // Reset knowledge buttons
+    document.querySelectorAll('.knowledge-btn').forEach(btn => btn.classList.remove('selected'));
 
     // Reset sliders
     document.getElementById('peso-fisico').value = 50;
     document.getElementById('peso-viso').value = 50;
     document.getElementById('peso-fisico-display').textContent = '50%';
     document.getElementById('peso-viso-display').textContent = '50%';
+    
+    document.getElementById('peso-carattere').value = 50;
+    document.getElementById('peso-aspetto').value = 50;
+    document.getElementById('peso-carattere-display').textContent = '50%';
+    document.getElementById('peso-aspetto-display').textContent = '50%';
+
+    // Reset preset dropdowns
+    document.getElementById('fisico-viso-preset').value = '50,50';
+    document.getElementById('carattere-aspetto-preset').value = '50,50';
 
     // Reset penalty
     document.getElementById('penalty-container').style.display = 'none';
@@ -1070,6 +1836,12 @@
 
     // Reset toggles
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+    
+    // Reset bonus buttons
+    document.querySelectorAll('.bonus-btn').forEach(b => b.classList.remove('selected'));
+
+    // Show all personal questions again (reset visibility)
+    updatePersonalQuestionsVisibility();
 
     // Rebuild stars
     buildStars('stars-fisico', 'votoFisico', null);
@@ -1077,8 +1849,13 @@
     buildStars('stars-amore', 'amore', 'score-amore-d');
     buildStars('stars-carattere', 'carattere', 'score-carattere-d');
     buildStars('stars-passioni', 'passioni', 'score-passioni-d');
+    // Nuove stelle
+    buildStars('stars-tette', 'tette', null, 5);
+    buildStars('stars-culo', 'culo', null, 5);
+    buildStars('stars-maturita', 'maturita', 'score-maturita-d');
+    buildStars('stars-connessione', 'connessione', 'score-connessione-d');
 
-    goTo(1);
+    goTo(0);
   }
 
   // ─── Comparator Functions ───────────────────────────────────────
@@ -1101,6 +1878,35 @@
     document.getElementById('comp2-peso-viso-display').textContent = viso + '%';
   }
 
+  function setPresetCompFromSelect(value) {
+    if (!value) return;
+    const [fisico, viso] = value.split(',').map(v => parseInt(v));
+    setPresetComp(fisico, viso);
+  }
+
+  function setPresetCarattereComp(carattere, aspetto) {
+    compState.person1.pesoCarattere = carattere;
+    compState.person1.pesoAspetto = aspetto;
+    compState.person2.pesoCarattere = carattere;
+    compState.person2.pesoAspetto = aspetto;
+    
+    document.getElementById('comp1-peso-carattere').value = carattere;
+    document.getElementById('comp1-peso-aspetto').value = aspetto;
+    document.getElementById('comp2-peso-carattere').value = carattere;
+    document.getElementById('comp2-peso-aspetto').value = aspetto;
+    
+    document.getElementById('comp1-peso-carattere-display').textContent = carattere + '%';
+    document.getElementById('comp1-peso-aspetto-display').textContent = aspetto + '%';
+    document.getElementById('comp2-peso-carattere-display').textContent = carattere + '%';
+    document.getElementById('comp2-peso-aspetto-display').textContent = aspetto + '%';
+  }
+
+  function setPresetCarattereCompFromSelect(value) {
+    if (!value) return;
+    const [carattere, aspetto] = value.split(',').map(v => parseInt(v));
+    setPresetCarattereComp(carattere, aspetto);
+  }
+
   function syncPesiComp(el, person, fromViso = false) {
     const v = parseInt(el.value);
     const personState = person === 1 ? compState.person1 : compState.person2;
@@ -1120,11 +1926,33 @@
     document.getElementById(prefix + '-peso-viso-display').textContent = personState.pesoViso + '%';
   }
 
+  function syncPesiCarattereComp(el, fromAspetto = false) {
+    const v = parseInt(el.value);
+    const prefix = el.id.includes('comp1') ? 'comp1' : 'comp2';
+    const personState = prefix === 'comp1' ? compState.person1 : compState.person2;
+    
+    if (fromAspetto) {
+      personState.pesoAspetto = v;
+      personState.pesoCarattere = 100 - v;
+      document.getElementById(prefix + '-peso-carattere').value = 100 - v;
+    } else {
+      personState.pesoCarattere = v;
+      personState.pesoAspetto = 100 - v;
+      document.getElementById(prefix + '-peso-aspetto').value = 100 - v;
+    }
+    
+    document.getElementById(prefix + '-peso-carattere-display').textContent = personState.pesoCarattere + '%';
+    document.getElementById(prefix + '-peso-aspetto-display').textContent = personState.pesoAspetto + '%';
+    
+    // Aggiorna dinamicamente i tag "peso ridotto" per il comparatore
+    updateWeightTags();
+  }
+
   // Comparator Stars
-  function buildStarsComp(containerId, person, key, displayId) {
+  function buildStarsComp(containerId, person, key, displayId, maxStars = 10) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= maxStars; i++) {
       const btn = document.createElement('button');
       btn.className = 'star-btn';
       btn.textContent = i;
@@ -1170,6 +1998,19 @@
     el.classList.add('selected');
   }
 
+  // Comparator Bonus buttons
+  function toggleBonusComp(type, person) {
+    const personState = person === 1 ? compState.person1 : compState.person2;
+    
+    if (type === 'gambe') {
+      personState.bonusGambe = !personState.bonusGambe;
+      document.getElementById('comp' + person + '-btn-gambe').classList.toggle('selected', personState.bonusGambe);
+    } else if (type === 'pancia') {
+      personState.bonusPancia = !personState.bonusPancia;
+      document.getElementById('comp' + person + '-btn-pancia').classList.toggle('selected', personState.bonusPancia);
+    }
+  }
+
   // Comparator Navigation
   function goToComp(step) {
     // Validate current step before moving forward
@@ -1181,18 +2022,36 @@
     // Hide all
     document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
 
+    // Check if girls are unknown and we should skip to results
+    if (compState.conosciRagazze === false && (step === 3 || step === 4)) {
+      calcolaComp();
+      return;
+    }
+
     document.getElementById('comp-sec-' + step).classList.add('visible');
     updateCompProgress(step);
   }
 
   function getCurrentCompStep() {
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 0; i <= 4; i++) {
       if (document.getElementById('comp-sec-' + i).classList.contains('visible')) return i;
     }
-    return 1;
+    return 0;
   }
 
   function validateCompStep(step) {
+    if (step === 0) {
+      // Validate names and knowledge for both persons
+      if (!compState.person1.nomeRagazza.trim() || !compState.person2.nomeRagazza.trim()) {
+        showCompErr('comp-err-0', 'Inserisci il nome per entrambe le ragazze.'); return false;
+      }
+      if (compState.conosciRagazze === null) {
+        showCompErr('comp-err-0', 'Specifica se conosci le ragazze.'); return false;
+      }
+    }
+    if (step === 1) {
+      // Step 1 non richiede validazione particolare (solo i pesi)
+    }
     if (step === 2) {
       if (!compState.person1.votoFisico || !compState.person1.votoViso || 
           !compState.person2.votoFisico || !compState.person2.votoViso) {
@@ -1204,15 +2063,23 @@
       }
     }
     if (step === 3) {
-      if (!compState.person1.amore || !compState.person1.carattere || !compState.person1.passioni ||
-          !compState.person2.amore || !compState.person2.carattere || !compState.person2.passioni) {
-        showCompErr('comp-err-3'); return false;
+      // Only validate personal questions if user knows girls
+      if (compState.conosciRagazze === true) {
+        if (!compState.person1.amore || !compState.person1.carattere || !compState.person1.passioni ||
+            !compState.person1.maturita || !compState.person1.connessione ||
+            !compState.person2.amore || !compState.person2.carattere || !compState.person2.passioni ||
+            !compState.person2.maturita || !compState.person2.connessione) {
+          showCompErr('comp-err-3', 'Compila tutti i modificatori per entrambe le ragazze.'); return false;
+        }
       }
     }
     if (step === 4) {
-      if (compState.person1.genitori === null || compState.person1.amiche === null ||
-          compState.person2.genitori === null || compState.person2.amiche === null) {
-        showCompErr('comp-err-4'); return false;
+      // Only validate social context questions if user knows girls
+      if (compState.conosciRagazze === true) {
+        if (compState.person1.genitori === null || compState.person1.amiche === null ||
+            compState.person2.genitori === null || compState.person2.amiche === null) {
+          showCompErr('comp-err-4', 'Seleziona un\'opzione per entrambe le voci di entrambe le ragazze.'); return false;
+        }
       }
     }
     return true;
@@ -1241,42 +2108,131 @@
     let vF = personState.votoFisico;
     let vV = personState.votoViso;
 
-    // Penalità obesità
-    let penaltyApplied = 0;
-    if (personState.penaltyType === 'obesa' && vF <= 6) {
-      penaltyApplied = -2.5;
-      vF = Math.max(1, vF + penaltyApplied);
-    }
-
-    // Media ponderata estetica (scala 0-10)
+    // Media ponderata estetica (scala 0-10) — nessuna modifica al voto grezzo
     const baseEstetica = vF * wF + vV * wV;
 
-    // Modificatori principali
-    const modAmore = personState.amore;
-    const modCarattere = personState.carattere;
-    const modPassioni = personState.passioni;
+    // Nuovi parametri estetici normalizzati
+    const tetteNorm = personState.tette > 0 ? (personState.tette / 5) * 10 : 0;  // 1-5 → 2-10
+    const culoNorm = personState.culo > 0 ? (personState.culo / 5) * 10 : 0;     // 1-5 → 2-10
+    const bonusFisici = (personState.bonusGambe ? 0.3 : 0) + (personState.bonusPancia ? 0.2 : 0);
 
-    // Modificatori secondari
-    const modGenitori = personState.genitori;
-    const modAmiche = personState.amiche;
+    let score = baseEstetica;
+    let penaltyApplied = 0;
 
-    // Formula (stessa del calcolatore normale)
-    const pesoE = 0.35;
-    const pesoA = 0.30;
-    const pesoCar = 0.20;
-    const pesoPas = 0.10;
-    const pesoGen = 0.05;
-    const pesoAmi = 0.03;
+    // Se si conoscono le ragazze, includi i modificatori personali
+    if (compState.conosciRagazze === true) {
+      // Modificatori principali
+      const modAmore = personState.amore;
+      const modCarattere = personState.carattere;
+      const modPassioni = personState.passioni;
+      const modMaturita = personState.maturita;
+      const modConnessione = personState.connessione;
 
-    const normGen = (modGenitori + 2) / 4 * 10;
-    const normAmi = (modAmiche + 1) / 2 * 10;
+      // Modificatori secondari
+      const modGenitori = personState.genitori;
+      const modAmiche = personState.amiche;
 
-    let score = baseEstetica * pesoE
-              + modAmore * pesoA
-              + modCarattere * pesoCar
-              + modPassioni * pesoPas
-              + normGen * pesoGen
-              + normAmi * pesoAmi;
+      // Nuovi pesi carattere vs aspetto fisico
+      const wCarattereRel = personState.pesoCarattere / 100;
+      const wAspettoRel = personState.pesoAspetto / 100;
+
+      // Logica di ponderazione basata su preferenze
+      let pesoE, pesoA, pesoCar, pesoPas, pesoMat, pesoCon, pesoGen, pesoAmi;
+      
+      const normGen = (modGenitori + 2) / 4 * 10;
+      const normAmi = (modAmiche + 1) / 2 * 10;
+      
+      if (wCarattereRel > wAspettoRel) {
+        // Preferisce carattere: modificatori relazionali normali, estetici ridotti
+        pesoE = 0.20;      // Base estetica ridotta
+        pesoA = 0.30;
+        pesoCar = 0.25;
+        pesoPas = 0.10;
+        pesoMat = 0.08;    // Nuovo: maturità
+        pesoCon = 0.07;    // Nuovo: connessione
+        pesoGen = 0.03;
+        pesoAmi = 0.02;
+        
+        // Riduci voti estetici dettagliati del 50%
+        const tetteWeighted = tetteNorm * 0.5 * 0.05;  // 5% del totale
+        const culoWeighted = culoNorm * 0.5 * 0.05;     // 5% del totale
+        const bonusWeighted = bonusFisici * 0.5;         // Bonus ridotti
+        
+        score = baseEstetica * pesoE
+                  + modAmore * pesoA
+                  + modCarattere * pesoCar
+                  + modPassioni * pesoPas
+                  + modMaturita * pesoMat
+                  + modConnessione * pesoCon
+                  + normGen * pesoGen
+                  + normAmi * pesoAmi
+                  + tetteWeighted + culoWeighted + bonusWeighted;
+                  
+      } else if (wAspettoRel > wCarattereRel) {
+        // Preferisce aspetto fisico: modificatori relazionali ridotti, estetici normali
+        pesoE = 0.30;      // Base estetica aumentata
+        pesoA = 0.15;      // Amore ridotto
+        pesoCar = 0.15;    // Carattere ridotto
+        pesoPas = 0.05;    // Passioni ridotte
+        pesoMat = 0.04;    // Maturità ridotta
+        pesoCon = 0.03;    // Connessione ridotta
+        pesoGen = 0.015;   // Genitori ridotti
+        pesoAmi = 0.01;    // Amiche ridotte
+        
+        // Pieni voti estetici dettagliati
+        const tetteWeighted = tetteNorm * 0.08;  // 8% del totale
+        const culoWeighted = culoNorm * 0.08;     // 8% del totale
+        const bonusWeighted = bonusFisici;       // Bonus pieni
+        
+        score = baseEstetica * pesoE
+                  + modAmore * pesoA
+                  + modCarattere * pesoCar
+                  + modPassioni * pesoPas
+                  + modMaturita * pesoMat
+                  + modConnessione * pesoCon
+                  + normGen * pesoGen
+                  + normAmi * pesoAmi
+                  + tetteWeighted + culoWeighted + bonusWeighted;
+                  
+      } else {
+        // 50/50: tutti i valori normali
+        pesoE = 0.25;
+        pesoA = 0.22;      // Leggermente ridotto per bilanciare
+        pesoCar = 0.20;
+        pesoPas = 0.08;
+        pesoMat = 0.06;    // Nuovo
+        pesoCon = 0.05;    // Nuovo
+        pesoGen = 0.02;
+        pesoAmi = 0.02;
+        
+        // Voti estetici dettagliati normali
+        const tetteWeighted = tetteNorm * 0.06;  // 6% del totale
+        const culoWeighted = culoNorm * 0.06;     // 6% del totale
+        const bonusWeighted = bonusFisici;       // Bonus normali
+        
+        score = baseEstetica * pesoE
+                  + modAmore * pesoA
+                  + modCarattere * pesoCar
+                  + modPassioni * pesoPas
+                  + modMaturita * pesoMat
+                  + modConnessione * pesoCon
+                  + normGen * pesoGen
+                  + normAmi * pesoAmi
+                  + tetteWeighted + culoWeighted + bonusWeighted;
+      }
+
+    } else {
+      // Se non si conoscono le ragazze, il voto è basato solo sull'estetica
+      // Con un piccolo bonus per l'oggettività (fino a 0.5 punti)
+      const oggettivityBonus = Math.min(0.5, baseEstetica * 0.05);
+      
+      // Aggiungi voti estetici dettagliati anche per ragazze sconosciute
+      const tetteWeighted = tetteNorm * 0.05;
+      const culoWeighted = culoNorm * 0.05;
+      const bonusWeighted = bonusFisici;
+      
+      score = baseEstetica + oggettivityBonus + tetteWeighted + culoWeighted + bonusWeighted;
+    }
 
     // Penalità obesità che dimezza il voto finale
     if (personState.penaltyType === 'obesa') {
@@ -1297,10 +2253,19 @@
         amore: personState.amore,
         carattere: personState.carattere,
         passioni: personState.passioni,
+        maturita: personState.maturita,
+        connessione: personState.connessione,
         genitori: personState.genitori,
         amiche: personState.amiche,
+        tette: personState.tette,
+        culo: personState.culo,
+        bonusGambe: personState.bonusGambe,
+        bonusPancia: personState.bonusPancia,
         penaltyApplied,
-        penaltyType: personState.penaltyType
+        penaltyType: personState.penaltyType,
+        conosciRagazza: compState.conosciRagazze,
+        pesoCarattere: personState.pesoCarattere,
+        pesoAspetto: personState.pesoAspetto
       }
     };
   }
@@ -1334,6 +2299,15 @@
 
   function showPersonResult(person, result) {
     const prefix = 'comp' + person;
+    const personState = person === 1 ? compState.person1 : compState.person2;
+    
+    // Update name header
+    const nameElement = document.getElementById(prefix + '-result-name');
+    if (personState.nomeRagazza.trim()) {
+      nameElement.textContent = personState.nomeRagazza;
+    } else {
+      nameElement.textContent = `Ragazza ${person}`;
+    }
     
     document.getElementById(prefix + '-result-number').textContent = result.score.toFixed(1);
 
@@ -1373,23 +2347,28 @@
     const strengths = [];
     const weaknesses = [];
 
-    // Analyze strengths
-    if (breakdown.amore >= 8) strengths.push('Ama molto intensamente');
-    if (breakdown.carattere >= 8) strengths.push('Carattere eccellente');
-    if (breakdown.passioni >= 8) strengths.push('Passioni interessanti');
+    // Only analyze personal strengths and weaknesses if the girl is known
+    if (breakdown.conosciRagazza === true) {
+      // Analyze strengths
+      if (breakdown.amore >= 8) strengths.push('Ama molto intensamente');
+      if (breakdown.carattere >= 8) strengths.push('Carattere eccellente');
+      if (breakdown.passioni >= 8) strengths.push('Passioni interessanti');
+      if (breakdown.genitori >= 1) strengths.push('Rapporto positivo con i genitori');
+      if (breakdown.amiche >= 0) strengths.push('Le amiche la apprezzano');
+
+      // Analyze weaknesses
+      if (breakdown.amore <= 4) weaknesses.push('Non ti ama abbastanza');
+      if (breakdown.carattere <= 4) weaknesses.push('Carattere problematico');
+      if (breakdown.passioni <= 4) weaknesses.push('Passioni limitate');
+      if (breakdown.genitori <= 0) weaknesses.push('Rapporto difficile con i genitori');
+      if (breakdown.amiche <= -1) weaknesses.push('Le amiche non ti gradiscono');
+    }
+
+    // Analyze physical strengths and weaknesses (always relevant)
     if (breakdown.fisico >= 8 && breakdown.pesoFisico >= 50) strengths.push('Fisico notevole');
     if (breakdown.viso >= 8 && breakdown.pesoViso >= 50) strengths.push('Viso bellissimo');
-    if (breakdown.genitori >= 1) strengths.push('Rapporto positivo con i genitori');
-    if (breakdown.amiche >= 0) strengths.push('Le amiche la apprezzano');
-
-    // Analyze weaknesses
-    if (breakdown.amore <= 4) weaknesses.push('Non ti ama abbastanza');
-    if (breakdown.carattere <= 4) weaknesses.push('Carattere problematico');
-    if (breakdown.passioni <= 4) weaknesses.push('Passioni limitate');
     if (breakdown.fisico <= 4 && breakdown.pesoFisico >= 50) weaknesses.push('Fisico scarso');
     if (breakdown.viso <= 4 && breakdown.pesoViso >= 50) weaknesses.push('Viso poco attraente');
-    if (breakdown.genitori <= 0) weaknesses.push('Rapporto difficile con i genitori');
-    if (breakdown.amiche <= -1) weaknesses.push('Le amiche non ti gradiscono');
     if (breakdown.penaltyType === 'obesa') weaknesses.push('Sovrappeso significativo');
 
     let analysisHTML = '<h4>Punti di forza</h4><div class="strengths-list">';
@@ -1420,7 +2399,9 @@
     if (winner === 0) {
       winnerText.textContent = `Pareggio! Entrambe hanno ottenuto ${score1.toFixed(1)}/10`;
     } else {
-      const winnerName = winner === 1 ? 'Ragazza 1' : 'Ragazza 2';
+      const person1Name = compState.person1.nomeRagazza.trim() || 'Ragazza 1';
+      const person2Name = compState.person2.nomeRagazza.trim() || 'Ragazza 2';
+      const winnerName = winner === 1 ? person1Name : person2Name;
       const winnerScore = winner === 1 ? score1 : score2;
       const loserScore = winner === 1 ? score2 : score1;
       const diff = Math.abs(winnerScore - loserScore);
@@ -1433,25 +2414,20 @@
   }
 
   function showCompBreakdown(result1, result2) {
-    const genitoriLabel1 = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[result1.breakdown.genitori] || '—';
-    const genitoriLabel2 = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[result2.breakdown.genitori] || '—';
-    const amicheLabel1 = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[result1.breakdown.amiche] || '—';
-    const amicheLabel2 = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[result2.breakdown.amiche] || '—';
+    const person1Name = compState.person1.nomeRagazza.trim() || 'Ragazza 1';
+    const person2Name = compState.person2.nomeRagazza.trim() || 'Ragazza 2';
     
-    const penaltyNote1 = result1.breakdown.penaltyType === 'obesa' ? ' (Penalità obesità: voto finale dimezzato)' : (result1.breakdown.penaltyApplied !== 0 ? ` (penalità: ${result1.breakdown.penaltyApplied})` : '');
-    const penaltyNote2 = result2.breakdown.penaltyType === 'obesa' ? ' (Penalità obesità: voto finale dimezzato)' : (result2.breakdown.penaltyApplied !== 0 ? ` (penalità: ${result2.breakdown.penaltyApplied})` : '');
-
-    document.getElementById('comp-breakdown-content').innerHTML = `
+    let breakdownHTML = `
       <div class="comp-comparison-grid">
         <div class="comp-comparison-header">
-          <div>Ragazza 1</div>
+          <div>${person1Name}</div>
           <div>Categoria</div>
-          <div>Ragazza 2</div>
+          <div>${person2Name}</div>
         </div>
         <div class="comp-comparison-row">
-          <div>${result1.breakdown.fisico}/10${penaltyNote1}</div>
+          <div>${result1.breakdown.fisico}/10${result1.breakdown.penaltyType === 'obesa' ? ' (Penalità obesità)' : ''}</div>
           <div>Fisico (${compState.person1.pesoFisico}% / ${compState.person2.pesoFisico}%)</div>
-          <div>${result2.breakdown.fisico}/10${penaltyNote2}</div>
+          <div>${result2.breakdown.fisico}/10${result2.breakdown.penaltyType === 'obesa' ? ' (Penalità obesità)' : ''}</div>
         </div>
         <div class="comp-comparison-row">
           <div>${result1.breakdown.viso}/10</div>
@@ -1463,54 +2439,105 @@
           <div>Base estetica ponderata</div>
           <div>${result2.breakdown.baseEstetica.toFixed(2)}/10</div>
         </div>
-        <div class="comp-comparison-row">
-          <div>${result1.breakdown.amore}/10</div>
-          <div>Quanto ti ama</div>
-          <div>${result2.breakdown.amore}/10</div>
-        </div>
-        <div class="comp-comparison-row">
-          <div>${result1.breakdown.carattere}/10</div>
-          <div>Carattere</div>
-          <div>${result2.breakdown.carattere}/10</div>
-        </div>
-        <div class="comp-comparison-row">
-          <div>${result1.breakdown.passioni}/10</div>
-          <div>Passioni</div>
-          <div>${result2.breakdown.passioni}/10</div>
-        </div>
-        <div class="comp-comparison-row">
-          <div>${genitoriLabel1}</div>
-          <div>Genitori</div>
-          <div>${genitoriLabel2}</div>
-        </div>
-        <div class="comp-comparison-row">
-          <div>${amicheLabel1}</div>
-          <div>Amiche</div>
-          <div>${amicheLabel2}</div>
-        </div>
-        <div class="comp-comparison-row highlight">
-          <div><strong>${result1.score.toFixed(1)} / 10</strong></div>
-          <div><strong>Punteggio finale</strong></div>
-          <div><strong>${result2.score.toFixed(1)} / 10</strong></div>
-        </div>
-      </div>
     `;
+
+    // Aggiungi i modificatori personali solo se si conoscono le ragazze
+    if (result1.breakdown.conosciRagazza === true || result2.breakdown.conosciRagazza === true) {
+      if (result1.breakdown.conosciRagazza === true) {
+        breakdownHTML += `
+          <div class="comp-comparison-row">
+            <div>${result1.breakdown.amore}/10</div>
+            <div>Quanto ti ama</div>
+            <div>${result2.breakdown.conosciRagazza === true ? result2.breakdown.amore + '/10' : 'N/A'}</div>
+          </div>
+          <div class="comp-comparison-row">
+            <div>${result1.breakdown.carattere}/10</div>
+            <div>Carattere</div>
+            <div>${result2.breakdown.conosciRagazza === true ? result2.breakdown.carattere + '/10' : 'N/A'}</div>
+          </div>
+          <div class="comp-comparison-row">
+            <div>${result1.breakdown.passioni}/10</div>
+            <div>Passioni</div>
+            <div>${result2.breakdown.conosciRagazza === true ? result2.breakdown.passioni + '/10' : 'N/A'}</div>
+          </div>
+        `;
+      }
+
+      if (result1.breakdown.conosciRagazza === true && result2.breakdown.conosciRagazza === true) {
+        const genitoriLabel1 = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[result1.breakdown.genitori] || '—';
+        const genitoriLabel2 = {'-2':'Ti odiano','-1':'Non ti gradiscono','0':'Indifferenti','1':'Neutrali','2':'Ti adorano'}[result2.breakdown.genitori] || '—';
+        const amicheLabel1 = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[result1.breakdown.amiche] || '—';
+        const amicheLabel2 = {'-1':'Ti odiano','0':'Indifferenti','1':'Ti amano'}[result2.breakdown.amiche] || '—';
+
+        breakdownHTML += `
+          <div class="comp-comparison-row">
+            <div>${genitoriLabel1}</div>
+            <div>Genitori</div>
+            <div>${genitoriLabel2}</div>
+          </div>
+          <div class="comp-comparison-row">
+            <div>${amicheLabel1}</div>
+            <div>Amiche</div>
+            <div>${amicheLabel2}</div>
+          </div>
+        `;
+      }
+    } else {
+      breakdownHTML += `
+        <div class="comp-comparison-row">
+          <div>Solo estetica</div>
+          <div>Tipo valutazione</div>
+          <div>Solo estetica</div>
+        </div>
+      `;
+    }
+
+    breakdownHTML += `
+      <div class="comp-comparison-row highlight">
+        <div><strong>${result1.score.toFixed(1)} / 10</strong></div>
+        <div><strong>Punteggio finale</strong></div>
+        <div><strong>${result2.score.toFixed(1)} / 10</strong></div>
+      </div>
+    </div>
+    `;
+
+    document.getElementById('comp-breakdown-content').innerHTML = breakdownHTML;
   }
 
   function restartComp() {
     // Reset comparator state
+    compState.conosciRagazze = null;
     Object.assign(compState.person1, {
+      nomeRagazza: '',
       pesoFisico: 50, pesoViso: 50,
+      pesoCarattere: 50, pesoAspetto: 50,
       votoFisico: 0, votoViso: 0, penaltyType: null,
       amore: 0, carattere: 0, passioni: 0,
-      genitori: null, amiche: null
+      genitori: null, amiche: null,
+      // Reset nuovi parametri
+      tette: 0, culo: 0,
+      bonusGambe: false, bonusPancia: false,
+      maturita: 0, connessione: 0
     });
     Object.assign(compState.person2, {
+      nomeRagazza: '',
       pesoFisico: 50, pesoViso: 50,
+      pesoCarattere: 50, pesoAspetto: 50,
       votoFisico: 0, votoViso: 0, penaltyType: null,
       amore: 0, carattere: 0, passioni: 0,
-      genitori: null, amiche: null
+      genitori: null, amiche: null,
+      // Reset nuovi parametri
+      tette: 0, culo: 0,
+      bonusGambe: false, bonusPancia: false,
+      maturita: 0, connessione: 0
     });
+
+    // Reset name inputs
+    document.getElementById('comp1-nome-ragazza').value = '';
+    document.getElementById('comp2-nome-ragazza').value = '';
+
+    // Reset knowledge buttons
+    document.querySelectorAll('.knowledge-btn').forEach(btn => btn.classList.remove('selected'));
 
     // Reset sliders
     document.getElementById('comp1-peso-fisico').value = 50;
@@ -1521,6 +2548,19 @@
     document.getElementById('comp1-peso-viso-display').textContent = '50%';
     document.getElementById('comp2-peso-fisico-display').textContent = '50%';
     document.getElementById('comp2-peso-viso-display').textContent = '50%';
+    
+    document.getElementById('comp1-peso-carattere').value = 50;
+    document.getElementById('comp1-peso-aspetto').value = 50;
+    document.getElementById('comp2-peso-carattere').value = 50;
+    document.getElementById('comp2-peso-aspetto').value = 50;
+    document.getElementById('comp1-peso-carattere-display').textContent = '50%';
+    document.getElementById('comp1-peso-aspetto-display').textContent = '50%';
+    document.getElementById('comp2-peso-carattere-display').textContent = '50%';
+    document.getElementById('comp2-peso-aspetto-display').textContent = '50%';
+
+    // Reset preset dropdowns
+    document.getElementById('comp-fisico-viso-preset').value = '50,50';
+    document.getElementById('comp-carattere-aspetto-preset').value = '50,50';
 
     // Reset penalty containers
     document.getElementById('comp1-penalty-container').style.display = 'none';
@@ -1530,6 +2570,13 @@
 
     // Reset toggles
     document.querySelectorAll('[id^="comp"][id$="-toggle"] .toggle-btn').forEach(b => b.classList.remove('selected'));
+    
+    // Reset bonus buttons
+    document.querySelectorAll('[id^="comp"][id$="-btn-gambe"], [id^="comp"][id$="-btn-pancia"]').forEach(b => b.classList.remove('selected'));
+
+    // Show all personal questions again (reset visibility)
+    updatePersonalQuestionsVisibilityComp(1);
+    updatePersonalQuestionsVisibilityComp(2);
 
     // Rebuild stars
     buildStarsComp('comp1-stars-fisico', 1, 'votoFisico', null);
@@ -1537,14 +2584,24 @@
     buildStarsComp('comp1-stars-amore', 1, 'amore', 'comp1-score-amore-d');
     buildStarsComp('comp1-stars-carattere', 1, 'carattere', 'comp1-score-carattere-d');
     buildStarsComp('comp1-stars-passioni', 1, 'passioni', 'comp1-score-passioni-d');
+    // Nuove stelle Ragazza 1
+    buildStarsComp('comp1-stars-tette', 1, 'tette', null, 5);
+    buildStarsComp('comp1-stars-culo', 1, 'culo', null, 5);
+    buildStarsComp('comp1-stars-maturita', 1, 'maturita', 'comp1-score-maturita-d');
+    buildStarsComp('comp1-stars-connessione', 1, 'connessione', 'comp1-score-connessione-d');
     
     buildStarsComp('comp2-stars-fisico', 2, 'votoFisico', null);
     buildStarsComp('comp2-stars-viso', 2, 'votoViso', null);
     buildStarsComp('comp2-stars-amore', 2, 'amore', 'comp2-score-amore-d');
     buildStarsComp('comp2-stars-carattere', 2, 'carattere', 'comp2-score-carattere-d');
     buildStarsComp('comp2-stars-passioni', 2, 'passioni', 'comp2-score-passioni-d');
+    // Nuove stelle Ragazza 2
+    buildStarsComp('comp2-stars-tette', 2, 'tette', null, 5);
+    buildStarsComp('comp2-stars-culo', 2, 'culo', null, 5);
+    buildStarsComp('comp2-stars-maturita', 2, 'maturita', 'comp2-score-maturita-d');
+    buildStarsComp('comp2-stars-connessione', 2, 'connessione', 'comp2-score-connessione-d');
 
-    goToComp(1);
+    goToComp(0);
   }
   function toggleDropdown() {
     const dropdown = document.getElementById('navDropdown');
@@ -1575,9 +2632,9 @@
         alert('Leaderboard in arrivo!');
         break;
       case 'comparator':
-        // Mostra il comparatore
+        // Mostra il comparatore (step 0 con nomi e conoscenza)
         document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-        document.getElementById('comp-sec-1').classList.add('visible');
+        document.getElementById('comp-sec-0').classList.add('visible');
         document.getElementById('progress-bar').style.display = 'none';
         break;
     }
@@ -1598,17 +2655,16 @@
   function loadPatchNotes() {
     // Qui puoi caricare le patch notes da un file JSON o definirle staticamente
     const patchNotes = [
-      // Esempio di patch note (commentato per ora)
-      // {
-      //   version: "v1.2.0",
-      //   date: "5 Aprile 2026",
-      //   description: "Miglioramenti all'interfaccia utente e nuove funzionalità",
-      //   changes: [
-      //     { type: "Aggiunto", text: "Sistema di patch notes per tenere traccia degli aggiornamenti" },
-      //     { type: "Migliorato", text: "Design del footer con pulsante non invadente" },
-      //     { type: "Corretto", text: "Warning CSS per compatibilità browser" }
-      //   ]
-      // }
+      {
+        version: "v1.1",
+        date: "5 Aprile 2026",
+        description: "Modifiche di bilancio e nuove features",
+        changes: [
+          { type: "Aggiunto", text: "Nuove domande, presets e cambiamenti generali alla logica" },
+          { type: "Nerf", text: "Nerf alle obese - Il meta delle obese stava diventando esagerato, alcuni giocatori ne abusavano abbiamo dovuto ribilanciare" },
+          { type: "Buff", text: "Buff all'amore - Abbiamo buffato l'essere amati perchè io con le donne non faccio sesso, ci faccio l'ammmore" }
+        ]
+      }
     ];
 
     const content = document.getElementById('patchNotesContent');
@@ -1642,12 +2698,33 @@
     `).join('');
   }
 
+  // ─── Name Input Handlers ─────────────────────────────────────
+  document.getElementById('nome-ragazza').addEventListener('input', function(e) {
+    state.nomeRagazza = e.target.value;
+  });
+
+  document.getElementById('comp1-nome-ragazza').addEventListener('input', function(e) {
+    compState.person1.nomeRagazza = e.target.value;
+  });
+
+  document.getElementById('comp2-nome-ragazza').addEventListener('input', function(e) {
+    compState.person2.nomeRagazza = e.target.value;
+  });
+
   // ─── Init ────────────────────────────────────────────────
   buildStars('stars-fisico', 'votoFisico', null);
   buildStars('stars-viso', 'votoViso', null);
   buildStars('stars-amore', 'amore', 'score-amore-d');
   buildStars('stars-carattere', 'carattere', 'score-carattere-d');
   buildStars('stars-passioni', 'passioni', 'score-passioni-d');
+  
+  // Nuove stelle per valutazioni estetiche (1-5)
+  buildStars('stars-tette', 'tette', null, 5);
+  buildStars('stars-culo', 'culo', null, 5);
+  
+  // Nuove stelle per modificatori relazionali
+  buildStars('stars-maturita', 'maturita', 'score-maturita-d');
+  buildStars('stars-connessione', 'connessione', 'score-connessione-d');
 
   // Initialize comparator stars
   buildStarsComp('comp1-stars-fisico', 1, 'votoFisico', null);
@@ -1656,11 +2733,26 @@
   buildStarsComp('comp1-stars-carattere', 1, 'carattere', 'comp1-score-carattere-d');
   buildStarsComp('comp1-stars-passioni', 1, 'passioni', 'comp1-score-passioni-d');
   
+  // Nuove stelle comparatore Ragazza 1
+  buildStarsComp('comp1-stars-tette', 1, 'tette', null, 5);
+  buildStarsComp('comp1-stars-culo', 1, 'culo', null, 5);
+  buildStarsComp('comp1-stars-maturita', 1, 'maturita', 'comp1-score-maturita-d');
+  buildStarsComp('comp1-stars-connessione', 1, 'connessione', 'comp1-score-connessione-d');
+  
   buildStarsComp('comp2-stars-fisico', 2, 'votoFisico', null);
   buildStarsComp('comp2-stars-viso', 2, 'votoViso', null);
   buildStarsComp('comp2-stars-amore', 2, 'amore', 'comp2-score-amore-d');
   buildStarsComp('comp2-stars-carattere', 2, 'carattere', 'comp2-score-carattere-d');
   buildStarsComp('comp2-stars-passioni', 2, 'passioni', 'comp2-score-passioni-d');
+  
+  // Nuove stelle comparatore Ragazza 2
+  buildStarsComp('comp2-stars-tette', 2, 'tette', null, 5);
+  buildStarsComp('comp2-stars-culo', 2, 'culo', null, 5);
+  buildStarsComp('comp2-stars-maturita', 2, 'maturita', 'comp2-score-maturita-d');
+  buildStarsComp('comp2-stars-connessione', 2, 'connessione', 'comp2-score-connessione-d');
+
+  // Inizializza i tag "peso ridotto" basati sulle preferenze iniziali
+  updateWeightTags();
 
   // Chiudi il dropdown quando si clicca fuori
   document.addEventListener('click', function(event) {
